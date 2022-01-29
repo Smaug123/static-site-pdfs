@@ -1,0 +1,10 @@
+*.log
+*.fls
+*.fdb_latexmk
+*.out
+*.aux
+*.synctex.gz
+*.swp
+*.pdf
+
+.DS_Store

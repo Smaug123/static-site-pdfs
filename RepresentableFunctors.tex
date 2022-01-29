@@ -1,0 +1,97 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\usepackage{tikz-cd}
+\usepackage{lmodern}
+
+% Reproducible builds
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\newmdtheoremenv{defn}{Definition}
+\newmdtheoremenv{thm}{Theorem}
+\newmdtheoremenv{motiv}{Motivation}
+
+\title{Representable functors and adjoint functors}
+\author{Patrick Stevens}
+
+\begin{document}
+
+\maketitle
+
+\tiny \begin{center} \url{https://www.patrickstevens.co.uk/misc/RepresentableFunctors/RepresentableFunctors.pdf} \end{center}
+
+\normalsize
+
+\emph{You should draw diagrams yourself throughout this document. It will be unreadable as mere symbols.}
+
+\begin{defn}A \emph{representable functor} is a functor $F: \mathcal{C} \to \mathbf{Sets}$ which is naturally isomorphic to $\text{Hom}_{\mathcal{C}}(A, \cdot)$ for some $A \in \mathcal{C}$.\end{defn}
+
+\
+
+It is an easy fact that representable functors preserve limits.
+Indeed, it is enough to show that they preserve products and equalisers, and both of these facts simply fall out of the relevant diagrams.
+
+What other functors preserve limits?
+Recall that morally, a functor has a left adjoint iff it preserves all limits.
+(There are set-theoretic issues here, so the statement isn't actually true as stated; these are dealt with by the General Adjoint Functor Theorem.)
+
+So we might hope that representable functors into $\mathbf{Sets}$ are precisely those which are right adjoints.
+
+\section{Right adjoints are representable}
+
+Suppose $G: \mathcal{C} \to \mathbf{Sets}$ is a right adjoint to $F: \mathbf{Sets} \to \mathcal{C}$.
+We want to find a representing object, and it's going to have to use $F$, so let's see what would happen if $G$ were naturally isomorphic to $\text{Hom}_{\mathcal{C}}(FA, \cdot)$.
+
+By the definition of an adjoint, for every $A \in \mathcal{C}$, have $$\text{Hom}_{\mathcal{C}}(FA, X) \cong \text{Hom}_{\mathbf{Sets}}(A, GX)$$
+
+But wait! We already have that $\text{Hom}_{\mathbf{Sets}}(\{ 1 \}, GX) \cong GX$.
+So actually $F1$ represents $G$.
+
+\section{Representable functors have left adjoints}
+
+This one is less immediate, so we'll motivate it.
+The most trivial example of a representable functor is $1_{\mathbf{Sets}}$, so we'll go for the next most trivial: $$\text{Hom}_{\mathbf{Sets}}(\{0, 1\}, \cdot) : \mathbf{Sets} \to \mathbf{Sets}$$
+
+What would it look like if this had an adjoint?
+We'll use the most concrete definition of an adjoint: as an initial object in an appropriate comma category.
+
+\[
+\begin{tikzcd}
+FA
+    \arrow[r, dashrightarrow, "h"]
+& B
+\\
+\mathrm{Hom}(\{0,1\}, FA)
+    \arrow[r, "h \circ \cdot"]
+& \mathrm{Hom}(\{0,1\}, B)
+\\
+A
+    \arrow[u, "\eta_A"]
+    \arrow[ur, "f"']
+&
+\end{tikzcd}
+\]
+
+What is $f: A \to \text{Hom}(\{0, 1\}, B)$?
+It is nothing more than an $A$-indexed collection of maps $\{0, 1\} \to B$.
+
+We want to make this unique $h: FA \to B$, given a collection of maps $\{0,1\} \to B$.
+
+That suggests we want to glue the maps together somehow, and $FA$ will be a ``glued object''.
+
+So we just take $FA$ to be the coproduct of $\{0,1\}$-many copies of $A$.
+
+That is, let $FA = \sqcup_{\{0, 1\}} A = \{a_0: a \in A\} \cup \{a_1: a \in A\}$, and define $\eta_A: A \to \text{Hom}(\{0,1\}, FA)$ by $a \mapsto (n \mapsto a_n)$.
+
+This construction generalises in exactly the obvious way to any representable functor $\mathbf{Sets} \to \mathbf{Sets}$, and then to $\mathcal{C} \to \mathbf{Sets}$ where $\mathbf{C}$ has coproducts.
+
+\end{document}
