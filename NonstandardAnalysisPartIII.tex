@@ -1,0 +1,1695 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{epstopdf}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\newmdtheoremenv{defn}{Definition}[section]
+\newmdtheoremenv{thm}{Theorem}[section]
+\newmdtheoremenv{motiv}{Motivation}[section]
+\newmdtheoremenv{lemma}[thm]{Lemma}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{caveat}{Caveat}
+\newtheorem*{example}{Example}
+\newtheorem*{motivation}{Motivation}
+
+\newcommand{\st}{\mathrm{st}}
+\newcommand{\app}[1]{\mathrm{app}\left[#1\right]}
+% the \hyp command defaults to *\mathbb{R}, but when supplied with an [argument], puts the star in front of it
+\newcommand{\hyp}[1][\mathbb{R}]{\prescript{*}{}{#1}}
+\newcommand{\near}{\simeq}
+\newcommand{\symdiff}{\triangle}
+\newcommand{\disjointunion}{\sqcup}
+\newcommand{\powerset}{\mathcal{P}}
+\newcommand{\gaussian}{\Phi}
+
+% found on Stack Exchange http://tex.stackexchange.com/a/6071
+\newcommand{\unaryminus}{\scalebox{0.75}[1.0]{\( - \)}}
+
+\title{Non-standard Analysis}
+\author{Patrick Stevens}
+\thanks{Supervised by Dr Thomas Forster for the essay component of Part III of the Cambridge Mathematical Tripos.}
+\date{Composed from October 2015 to April 2016. Released on 15th June 2016.}
+
+\begin{document}
+\maketitle
+\tiny \begin{center} \url{https://www.patrickstevens.co.uk/misc/NonstandardAnalysis/NonstandardAnalysisPartIII.pdf} \end{center}
+Licence: CC BY-SA \url{https://creativecommons.org/licenses/by-sa/4.0/}.
+You are free to share and adapt this work for any purpose, even commercially, as long as you attribute it, indicating which changes were made, without suggesting that the licensor endorses you or your use.
+You must distribute derivative works under the same license as the original.
+\normalsize
+\pagebreak
+
+\tableofcontents
+\section{What is non-standard analysis?}
+
+Non-standard analysis is the study of a model of the reals in which there are \emph{infinitesimals}: there is some $\varepsilon > 0$ such that, for all ``standard'' reals $x$, we have $\varepsilon < x$.
+We shall follow P\'{e}try \cite{petry} in assuming the existence of a ``field of hyperreals'': $\hyp$, an ordered field which extends $\mathbb{R}$'s order structure and inherits its multiplicative structure.
+The key fact about $\hyp$ which we shall also impose is the \emph{Transfer Principle} of Definition \ref{defn:transfer}.
+The truth of the transfer principle follows from \L os's Theorem (see Theorem 4.3 of Davis \cite{davis}).
+However, this essay aims for a treatment of the analysis involved, rather than getting bogged down in foundational details, so we will not prove it here.
+
+\
+
+\begin{defn}[Transfer Principle] \label{defn:transfer}
+Let $\phi$ be a first-order sentence in the language of the totally ordered field $\mathbb{R}$.
+(That is, $\phi$ quantifies only over real numbers, not over subsets of the reals.)
+Then $\phi$ is true in $\mathbb{R}$ if and only if $\hyp[\phi]$ is true in $\hyp$, where $\hyp[\phi]$ is obtained by replacing all quantifiers $(\forall x \in \mathbb{R})$ with $(\forall x \in \hyp)$ and $(\exists x \in \mathbb{R})$ with $(\exists x \in \hyp)$.
+\end{defn}
+
+\
+
+This version of the transfer principle is not actually the strongest possible; we will return to this in Section \ref{sec:internal}, where we examine certain cases under which we may quantify over sets.
+
+There is a simpler but more imprecise form, which we state here for motivation in the form given by P\'{e}try:
+
+\
+
+\begin{defn}[Transfer Principle, imprecise form] \label{defn:transferimprecise}
+If two (first-order definable) systems of equations are equivalent in $\mathbb{R}$, then they are equivalent in $\hyp$.
+Moreover, every (first-order definable) function $f: \mathbb{R} \to \mathbb{R}$ extends to a function $\hyp[f] : \hyp \to \hyp$ such that $\hyp[f] \vert_{\mathbb{R}} = f$.
+\end{defn}
+
+\
+
+In the first sections of this essay, whenever we invoke the transfer principle, all the functions and sets we will consider shall be first-order definable.
+Therefore this formulation suffices for the moment.
+
+\begin{example}
+To give an example of the transfer principle in action, consider the two equivalent sets $$\{x \in \mathbb{R}: x^2 > 7 \} ; \{x \in \mathbb{R}: x > \sqrt{7} \vee -x > \sqrt{7} \}$$
+
+We may define $7$ in a first-order way, as $1+1+1+1+1+1+1$ (recalling that we are working in the language of the totally ordered field $\mathbb{R}$).
+Similarly, $-1$ has the following first-order description: $$(\exists x \in \mathbb{R})(x+1 = 0)$$
+The square-root function may be expressed in a first-order way: $$(\forall x \geq 0) (\exists y \geq 0)(y^2 = x)$$ so (imprecisely) $\sqrt{}: x \mapsto \sqrt{x}$ extends to a function $\hyp[\sqrt{}] : \hyp \to \hyp$, and (formally) $\hyp[\sqrt{}]$ is described by $$(\forall x \in \hyp)(x \geq 0 \rightarrow (\exists y \in \hyp)([y \geq 0] \wedge [y \times y = x]))$$
+which is a true statement of $\hyp$ by the transfer principle.
+
+Then viewing $7$ and $-1$ as elements of $\hyp$, the transfer principle states (imprecisely) that $$\{x \in \hyp: x^2 > 7\}; \{ x \in \hyp: x > \hyp[\sqrt{7}] \vee -x > \hyp[\sqrt{7}] \}$$ are equivalent sets in $\hyp$.
+Formally, $$(\forall x \in \mathbb{R})(x \times x > 7 \leftrightarrow [x > \sqrt{7}] \vee [x < -1 \times \sqrt{7}])$$
+and so by transfer, $$(\forall x \in \hyp)(x \times x > 7 \leftrightarrow [x > \hyp[\sqrt{7}]] \vee [x < -1 \times \hyp[\sqrt{7}]] )$$
+Therefore, the inequality $x^2 > 7$ has solutions $x > \sqrt{7}$ and $x < -\sqrt{7}$ whether we are working in $\mathbb{R}$ or $\hyp$.
+\end{example}
+
+\begin{remark}[Existence of $\hyp$]
+Why are we justified in assuming the existence of $\hyp$?
+The spirit in which we do so is akin to the fact that we teach arithmetic while perfectly content not to define $\mathbb{N}$ rigorously, but simply to recognise its existence.
+To obtain an explicit construction, we may use ultrapowers (see Robinson \cite{robinson}); we will sketch this approach in Section \ref{sec:internal} of this essay.
+Alternatively, we may understand the essence of why a model exists via the Compactness Theorem of first-order logic.
+Adjoining a symbol $\varepsilon$ to the language of the reals, and adding axioms that $$\{ \varepsilon > 0 ; \varepsilon < \frac{1}{n} : n \in \mathbb{N} \}$$
+produces a system which has a model by compactness.
+Such a model contains an infinitesimal $\varepsilon$.
+\end{remark}
+
+\section{Basic definitions}
+
+We consider a non-standard model $\hyp$ of the reals.
+The key difference between $\hyp$ and $\mathbb{R}$ is that every finite $r \in \hyp$ has a \emph{standard part}, denoted $\st(r)$, and a \emph{non-standard part}.
+The standard part is a standard real (that is, a member of $\mathbb{R}$) which is ``infinitely close'' to $r$: that is, $r - \st(r)$ is infinitesimal.
+
+We write $r \near s$ for the relationship ``$r-s$ is infinitesimal'': explicitly, $r \near s$ iff either $r = s$ or for every $\varepsilon \in \mathbb{R}$ with $\varepsilon > 0$, we have 
+$$\begin{dcases}
+0 < r-s < \varepsilon & \text{if $r > s$} \\
+0 < s-r < \varepsilon & \text{if $r < s$}
+\end{dcases}
+$$
+
+\begin{defn} \label{defn:finite}
+A hyperreal $r$ is \emph{finite} iff there is a standard real $B$ such that $-B \leq r \leq B$.
+\end{defn}
+
+\begin{caveat} Several authors draw a distinction between various different flavours of ``finite'', ``limited'', ``appreciable'' and similar terms, denoting combinations of ``finite and not infinitesimal'', ``finite infinitesimal'' and so forth.
+We will not need such distinctions in this essay, so will use simply the word ``finite'' as in Definition \ref{defn:finite}, but when reading other authors, make sure to look up their terminology.
+\end{caveat}
+
+\
+
+\begin{thm}
+Every finite hyperreal $r$ has a unique real standard part.
+\end{thm}
+
+\
+
+We give the proof here as a simple demonstration of some of the operations on infinitesimals.
+
+\begin{proof}
+For uniqueness: suppose $x, y \in \mathbb{R}$ are both ``infinitely close'' to $r \in \hyp$.
+That is, for all $\varepsilon \in \mathbb{R}^{>0}$, $$|r-x| < \varepsilon, |r-y| < \varepsilon$$
+By the triangle inequality, $$|(r-x) - (r-y)| < 2 \varepsilon$$
+so $|x-y|$ is less than $2 \varepsilon$ for all $\varepsilon$.
+
+(The triangle inequality is true by the transfer principle, but we will omit the easy proof of this fact.
+We will soon see a fully-worked example of the use of the transfer principle, in Theorem \ref{thm:differentiatepolynomial}.)
+
+Since $x, y$ are both standard reals, this means $x-y = 0$.
+
+For existence: if $r \in \hyp$ is finite, then there is positive $B \in \mathbb{R}$ such that $-B \leq r \leq B$.
+Then $$S := \{ x \in \mathbb{R}: r \leq x \}$$ is a set of reals which is nonempty (containing $B$), and it is bounded below (by $-B$), so it has a greatest lower bound, which we shall optimistically call $\st(r)$ (for ``standard'').
+
+By construction, $\st(r)$ is indeed a standard real.
+We will prove by contradiction that $r-\st(r)$ is infinitesimal.
+
+If $r = \st(r)$ then we are instantly done, so suppose that $|r - \st(r)| > \varepsilon$ for some $\varepsilon \in \mathbb{R}^{>0}$.
+
+If $r > \st(r)$, then $r > \varepsilon + \st(r)$.
+Then in fact $\st(r) + \frac{\varepsilon}{2}$ is a lower bound for $S$, contradicting the definition of $\st(r)$ as a \emph{greatest} lower bound.
+
+If $r < \st(r)$, then $r < \st(r) - \varepsilon$, so $\st(r) - \frac{\varepsilon}{2}$ lies in $S$, contradicting the definition of $\st(r)$ as a lower bound for $S$.
+\end{proof}
+
+This justifies the definition of $\st(r)$ as \emph{the} standard part of $r$.
+
+There are many easy results about standard parts, which all have similar patterns of proof; we omit the proofs for brevity, and we may use without comment certain obvious results such as the following.
+
+\begin{itemize}
+\item $\st(-u) = - \st(u)$
+\item $\st(u+v) = \st(u) + \st(v)$
+\item if $u \leq v$, then $\st(u) \leq \st(v)$.
+\end{itemize}
+
+The collection of hyperreals infinitesimally close to hyperreal $r$ is known as the \emph{monad} of $r$, and the ``local properties'' we study in Analysis can often be related to the study of behaviour in the monad of a point.
+
+\section{Derivatives}
+
+As an example of the idea of ``local properties may be defined in monads'', we give the following definition of the derivative:
+
+\
+
+\begin{defn} \label{derivative}
+The \emph{derivative} of $f: \mathbb{R} \to \mathbb{R}$ at $x \in \mathbb{R}$ is defined to be $$f'(x) := \st \left( \dfrac{\hyp[f](x+\delta)-\hyp[f](x)}{\delta} \right)$$
+for any infinitesimal $\delta$; $f$ is said to be \emph{differentiable} at $x$ if this is well-defined.
+\end{defn}
+
+\
+
+By way of demonstration, consider the function $f: \mathbb{R} \to \mathbb{R}$ by $x \mapsto x^n$ (some $n \in \mathbb{N}$).
+By the (imprecise) transfer principle, this defines a function $\hyp[f]: \hyp \to \hyp$ which coincides with the standard version on standard reals.
+This being our first theorem proved by non-standard methods, we will walk through it in complete pedantic detail; subsequent proofs will be considerably lighter to aid comprehension.
+
+\
+
+\begin{thm} \label{thm:differentiatepolynomial}
+If $f: \mathbb{R} \to \mathbb{R}$ by $x \mapsto x^n$, then $f'(x) = n x^{n-1}$.
+\end{thm}
+\begin{proof}
+The function $f: \mathbb{R} \to \mathbb{R}$ by $x \mapsto x^n$ admits the first-order description $$(\forall x \in \mathbb{R})(\exists y \in \mathbb{R})(y = x \times x \times \dots \times x)$$
+where there are $n$ terms in the product.
+(Henceforth we will use the shorthand $r^n$ for $r \times r \times \dots \times r$, with $n$ terms in the product.)
+This is a schema of true statements in $\mathbb{R}$, one for each $n \in \mathbb{N}$.
+
+Therefore, by the transfer principle, for each $n \in \mathbb{N}$ the following sentence is true in $\hyp$, so we may use it to define $\hyp[f]: \hyp \to \hyp$: $$(\forall x \in \hyp)(\exists y \in \hyp)(y = x^n)$$
+
+Recall that we wish to show that $$\st \left( \frac{(x+\delta)^n-x^n}{\delta} \right)$$ is well-defined as $\delta$ varies, and equal to $n x^{n-1}$; for this, we need the binomial theorem.
+
+We will require the following shorthand: fixing $n$ and $m$, we understand $\binom{n}{m}$ as being defined by the natural number $$\frac{n!}{m! (n-m)!}$$
+which is expressed as $1+1+\dots+1$ for appropriately many terms in the summand.
+
+Now for the binomial theorem itself:
+$$(\forall x \in \mathbb{R})(\forall y \in \mathbb{R})((x+y)^n = \binom{n}{0} x^n + \binom{n}{1} x^{n-1} y + \dots + \binom{n}{n-1} x y^{n-1} + \binom{n}{n} y^n)$$
+This is again a schema of true statements in $\mathbb{R}$, one for each $n \in \mathbb{N}$, and each of those statements is to be understood as being written out in full with no elided terms.
+We emphasise that $\binom{n}{m}$ is simply a number: it does not even contain any bound variables, and if we expanded out all of the shorthand, it would appear to be in the form $1+1+\dots+1$.
+
+Since the binomial theorem holds in the reals, every statement in that schema must be true in the hyperreals when we transfer to $\hyp$:
+
+$$(\forall x \in \hyp)(\forall y \in \hyp)((x+y)^n = \binom{n}{0} x^n + \binom{n}{1} x^{n-1} y + \dots + \binom{n}{n-1} x y^{n-1} + \binom{n}{n} y^n)$$
+
+Notice that behind the scenes, $n$ is the same $1+1+\dots+1$ as it always was, so there is no transfer required in the definition of $\binom{n}{m}$.
+
+Therefore, in particular, we have $$\frac{(x+\delta)^n-x^n}{\delta} = n x^{n-1} + \delta \cdot \binom{n}{2} x^{n-2} + \dots + \delta^{n-2} \cdot \binom{n}{n-1} x^1 + \delta^{n-1}$$
+where $\delta$ is any infinitesimal.
+
+The standard part of this is $n x^{n-1}$, since every subsequent term has a factor of $\delta$.
+(We are implicitly using that adding infinitesimals does not change standard parts, and multiplying a standard real or an infinitesimal by an infinitesimal results in an infinitesimal.)
+\end{proof}
+
+How about an example where the derivative fails to be defined?
+The canonical example is, of course, $g(x) = |x|$.
+This extends to $\hyp[g]: \hyp \to \hyp$; for readability, we will suppress the asterisk on $\hyp[|]\cdot | $, and henceforth we may use $\hyp[f]$ without the preamble stating the first-order formula which describes it.
+We shall take it as read that for any first-order definable function $f$, $\hyp[f]$ is defined by the transfer of the formula defining $f$.
+
+\
+
+\begin{thm}
+If $g: \mathbb{R} \to \mathbb{R}$ by $x \mapsto |x|$, then $g'$ is not defined at $0$, but is defined elsewhere and is equal to the sign of $x$.
+\end{thm}
+\begin{proof}
+At $0$, the derivative would be $$\st \left( \frac{|\delta|}{\delta} \right) = \hyp[\text{sgn}](\delta)$$ which is not constant as $\delta$ varies over the monad of $0$, because there are both positive and negative infinitesimals.
+(If $\delta$ is a positive infinitesimal, then $-\delta$ is negative.)
+
+Elsewhere, however, the derivative would be $$\st \left( \frac{|x+\delta| - |x|}{\delta} \right)$$
+which splits into two cases:
+
+$$\begin{dcases}
++1 = \frac{x+\delta - x}{\delta} & x > 0 \\
+-1 = \frac{-(x+\delta) - (-x)}{\delta} & x < 0
+\end{dcases}$$
+
+This is because $x < 0$ implies $|x + \delta| \leq |x| + |\delta| \near |x| < 0$, and similarly for $x > 0$.
+\end{proof}
+
+\subsection{The chain rule}
+
+We present the chain rule as a simple example of a theorem whose proof is made very neat and tidy by the use of infinitesimals.
+
+\
+
+\begin{thm}[Chain rule]
+Let $f, g: \mathbb{R} \to \mathbb{R}$ be differentiable [in the non-standard sense]. Then $f \circ g$ is differentiable, and $(f \circ g)'(x) = f'(g(x)) g'(x)$.
+\end{thm}
+\begin{proof}
+Consider $$X = \st \left( \frac{f(g(x+\delta)) - f(g(x))}{\delta} \right)$$
+
+We have $$g(x+\delta) = (g'(x) + \varepsilon) \delta + g(x)$$
+for some $\varepsilon$ infinitesimal (depending on $\delta$), by definition of $g'(x)$ as $\st \left( \frac{g(x+\delta) - g(x)}{\delta} \right)$.
+
+Substituting this into $X$, obtain $$X = \st \left( \frac{f[g(x) + \delta (g'(x) + \varepsilon)] - f(g(x))}{\delta} \right)$$
+
+By differentiability of $f$, have $$f'(g(x)) = \st \left( \frac{f(g(x) + \gamma) - f(g(x))}{\gamma} \right)$$
+for any infinitesimal $\gamma$; so letting $\gamma = \delta (g'(x) + \varepsilon)$, obtain
+$$f'(g(x)) = \st \left( \frac{f[g(x) + \delta (g'(x) + \varepsilon)]-f(g(x))}{\delta (g'(x) + \varepsilon)} \right)$$
+
+Factoring out $\st(g'(x) + \varepsilon) = g'(x)$ from the denominator, this is simply $\frac{X}{g'(x)}$, so $$X = g'(x) f'(g(x))$$
+
+\end{proof}
+
+Notice how we did not require any bounding of error terms: the infinitesimals ``bounded themselves'' and simply vanished at the end without further hassle.
+
+The rules of \emph{linearity of the derivative} and the \emph{product rule} follow very similarly.
+
+\
+
+\begin{thm} \label{thm:increasingimpliesderivativepositive} Let $f: [a,b] \to \mathbb{R}$ be continuous on $[a,b]$ and differentiable on $(a,b)$.
+If $f$ is increasing, then $f'(x) \geq 0$ for all $x$.
+\end{thm}
+\begin{proof}
+It is a first-order fact that for all $y > x$, have $f(y) \geq f(x)$.
+Therefore it remains true on moving to the hyperreals.
+
+Then $$\frac{f(x+\delta) - f(x)}{\delta} \geq 0$$ whenever $\delta$ is infinitesimal, so it remains so on taking standard parts.
+\end{proof}
+\begin{remark}
+This is a partial converse to the theorem that having a positive derivative means the function is increasing; that fact, however, is a purely standard consequence of the Mean Value Theorem (which is itself a consequence of Rolle's Theorem, Theorem \ref{thm:rolle}), so we will not prove it here.
+Moreover, the standard proof of the ``standard consequence'' is elegant; this is an advertisement for using both standard and non-standard methods together.
+\end{remark}
+
+\section{Continuity}
+
+Recall the definition of a closed interval in $\mathbb{R}$: $$[a, b] = \{ x \in \mathbb{R}: a \leq x \leq b \}$$
+The transfer principle lets us carry this over to $\hyp$: to $$\hyp[[]a, b] = \{ x \in \hyp: a \leq x \leq b \}$$
+
+\begin{remark}There are hyperreals \emph{infinitesimally} less than $a$, which do not appear in $\hyp[[]a, b]$.
+Such hyperreals have standard part equal to $a$ and yet are not in $\hyp[[]a, b]$.
+This demonstrates that $\st(r) \in X$ does not necessarily imply $r \in \hyp[X]$.
+\end{remark}
+
+\
+
+\begin{defn}[Continuity] We say a function $f: [a, b] \to \mathbb{R}$ is \emph{continuous} at $x \in [a, b]$ iff $\hyp[f](x+\delta) \near \hyp[f](x)$ for all $\delta$ infinitesimal with $x+\delta \in \hyp[[]a, b]$. That is, $\hyp[f]$ has a standard part which is constant on the monad of $x \in \mathbb{R}$. 
+\end{defn}
+
+\
+
+For illustration, we shall prove here that this definition is equivalent to the $\varepsilon$-$\delta$ definition of continuity, but in general we will use non-standard definitions freely throughout this essay.
+(We will not prove that the non-standard definition of ``derivative'' is equivalent to the standard one, for instance.)
+
+\
+
+\begin{thm} \label{thm:equivalence_of_continuity} The function $f: [a, b] \to \mathbb{R}$ is $\varepsilon$-$\delta$ continuous at $x$ iff it is continuous at $x$ in the non-standard sense.
+\end{thm}
+
+\
+
+To make the proof easier to read, we will continue to suppress the asterisk in the extension $\hyp[|] \cdot |$ of the modulus function.
+This proof may be found as Corollary 7.1.2 in Goldblatt, although it is not very difficult to come up with by oneself.
+
+\begin{proof}
+Forward direction: let $x \in [a,b]$, and suppose for all $\varepsilon$ there is $\delta$ such that for all $y$ with $|y-x| < \delta$, have $|f(y)-f(x)| < \varepsilon$.
+Then letting $\varepsilon_n = \frac{1}{n}$, obtain $\delta_n$ such that for all $y$ with $|y-x| < \delta_n$, $|f(y) -f(x) | < \frac{1}{n}$.
+Transfer this collection of facts (one for each $n \in \mathbb{N}$) to $\hyp$.
+
+But every $y \in \hyp$ with $y \near x$ satisfies $|y-x| < \delta_n$ for all $n$, so $|\hyp[f](y) - \hyp[f](x)| < \frac{1}{n}$ for all $n$.
+That is, $\hyp[f](y) \near \hyp[f](x)$ for all $y \near x$.
+
+Conversely, suppose $f$ is nonstandard-continuous at $x \in \mathbb{R}$.
+Let $\varepsilon \in \mathbb{R}^{>0}$.
+For any infinitesimal $\delta > 0$, have that for all $y \in \hyp$ with $|y-x| < \delta$, $| \hyp[f](y) - \hyp[f](x)| < \varepsilon$.
+Therefore (in particular) there is some $\delta \in \hyp^{>0}$ such that for all $y \in \hyp$ with $|y-x| < \delta$, $| \hyp[f](y) - \hyp[f](x)| < \varepsilon$.
+
+By the reverse direction of the transfer principle, the same statement must also hold in $\mathbb{R}$:
+there is $\delta \in \mathbb{R}^{>0}$ such that for all $y \in \mathbb{R}$ with $|y-x| < \delta$, have $|f(y) - f(x)| < \varepsilon$.
+
+\end{proof}
+
+This is one of the only places we will use the reverse direction of the transfer principle; Theorem \ref{thm:equivalence_of_continuity} was included only to demonstrate the usual character of such proofs.
+Again, we will focus on the development of analysis results in non-standard analysis rather than on foundational rigour.
+The reverse of the transfer principle appears usually when showing that standard definitions are equivalent to non-standard ones.
+
+Recall from Definition \ref{derivative} that $f: [a,b] \to \mathbb{R}$ is \emph{differentiable} at $x \in \mathbb{R}$ iff the quantity $$\st \left( \frac{f(x+\delta) - f(x)}{\delta} \right)$$
+is invariant for infinitesimal $\delta$.
+
+Then it is easy to see that continuity is required for differentiability.
+Indeed, if $f(y)$ and $f(x)$ are not infinitesimally close even though $y = x+\delta \near x$, then $f(x+\delta) - f(x)$ is not infinitesimal, so $\frac{f(x+\delta) - f(x)}{\delta}$ must be infinite.
+
+\subsection{Uniform continuity} \label{sec:uniform} By definition, $f: [a, b] \to \mathbb{R}$ is continuous at $x \in \mathbb{R}$ iff $\hyp[f] : \hyp[[]a, b] \to \hyp$ has invariant standard part when we perturb standard-real $x \in [a,b]$ infinitesimally.
+If we form the stronger requirement that $\hyp[f]$ have invariant standard part when we perturb \emph{any hyperreal} $x \in \hyp[[]a, b]$ infinitesimally, then we obtain \emph{uniform continuity}.
+This fact is highly surprising, but for reasons of space we will not prove it here.
+
+\
+
+\begin{thm} \label{thm:continuous_implies_uniformly_continuous} Let $f: [a,b] \to \mathbb{R}$ be continuous. Then $f$ is uniformly continuous.
+\end{thm}
+\begin{proof}
+Let $x \in \hyp[[]a, b]$, and $y \near x$. Then say $z = \st(x) \in \mathbb{R}$.
+Certainly $\st(y) = \st(x)$, so $f(x) \near f(z)$ by continuity of $f$ at the real $z$; and $f(z) \near f(y)$ similarly.
+Hence by transitivity of $\near$, have $f(x) \near f(y)$.
+\end{proof}
+
+\begin{example}
+Notice how this fails for $f: (0, 1] \to \mathbb{R}$ by $x \mapsto \frac{1}{x}$.
+Indeed, our choice of $x$ could have been infinitesimal; then $z = \st(x) = 0$ lies outside the domain of $f$.
+This formulation makes it obvious what fact we used about the non-standard formulation of a compact set: namely, that the set is closed under taking standard parts.
+\end{example}
+
+In a standard setting, the two usual proofs of Theorem \ref{thm:continuous_implies_uniformly_continuous} go via convergence of sequences and Bolzano-Weierstrass, or via the Lebesgue number lemma.
+This beautifully elegant proof has eliminated an enormous amount of the complexity of the same result in the standard setting, and its simplicity and lack of clutter reveals precisely what ``compact'' should mean in more general non-standard metric spaces.
+
+\subsection{Compactness}
+
+Robinson discovered an extremely neat formulation of the notion of compactness.
+
+\
+
+\begin{defn}[Compactness] \label{defn:compact} A set $X \subseteq \mathbb{R}$ is \emph{compact} iff every $x \in \hyp[X]$ has some $y \in X$ with $x \near y$.
+\end{defn}
+
+\
+
+From this definition, it is easy that the continuous image of a compact set is compact.
+
+\
+
+\begin{thm} \label{thm:continuouscompact} Let $f: X \to \mathbb{R}$ be continuous and $X$ compact.
+Then the image of $f$ is compact.
+\end{thm}
+\begin{proof}
+Let $y \in \hyp[(f(X)]) = \hyp[f](\hyp[X])$.
+We wish to show that there is $x \in f(X)$ with $y \near x$.
+
+Say $y = \hyp[f](a)$, and let $x = f(\st(a))$.
+Then $\hyp[f](a) \near \hyp[f](\st(a))$ by continuity of $f$, so we are immediately done.
+\end{proof}
+
+To obtain a more specific form of Theorem \ref{thm:continuouscompact} without using the Heine-Borel theorem---that is, using closed boundedness directly rather than through compactness---it will be useful to develop the idea of the hypernatural numbers and hyperfinite partitions of a set.
+
+\section{Hypernaturals} \label{sec:hypernaturals}
+
+For the moment, we will work within the ultrapower construction of the hyperreals.
+It is possible to proceed while remaining agnostic about the construction, but the details for this section are much simpler when working with an ultrapower.
+We will paint the construction in broad strokes here.
+
+\subsection{Internal sets}  \label{sec:internal}
+
+\begin{motivation}
+The motivating example for this section is the canonical model of Peano arithmetic embedded in $\mathbb{R}$: namely, $\mathbb{N}$.
+When we pass to $\hyp$, we might expect to obtain a non-standard model of Peano arithmetic, playing the same role in $\hyp$ as $\mathbb{N}$ does in $\mathbb{R}$.
+
+The transfer principle tells us, informally, that ``from within the model, everything looks like $\mathbb{R}$''.
+We would like a way to capture, for instance, the \emph{Archimedean property}: that for every $r \in \mathbb{R}$, there is $n \in \mathbb{N}$ such that $r < n$.
+That is, we seek a set of ``hypernaturals'', forming a non-standard model of Peano arithmetic embedded in $\hyp$, such that every hyperreal $r$ has a hypernatural $N$ bounding it above.
+\end{motivation}
+
+We will require the notion of an ``internal'' set: intuitively, ``a set which exists in the model of $\hyp$''.
+For most of our purposes, it is enough to know that sets whose members are precisely those hyperreals satisfying some first-order property are internal (which is proved in Section 11.7 of Goldblatt \cite{goldblatt}, and is indeed a form of the transfer principle), but we shall be more explicit using the ultrapower construction.
+
+Given a nonprincipal ultrafilter $\mathcal{F}$ on $\mathbb{N}$, we construct $\hyp$ as the collection of sequences of reals, modulo the equivalence relation that $\langle r_n \rangle \sim \langle s_n \rangle$ if and only if $\{ n \in \mathbb{N} : r_n = s_n \} \in \mathcal{F}$.
+The intuition is that the two sequences ``agree almost everywhere''.
+(See Chapter 3 of Goldblatt \cite{goldblatt}).
+We write $[r_n]$ for the equivalence class of the sequence $\langle r_n \rangle$.
+
+Fix a sequence of sets $\langle A_n \rangle$ with each $A_n \subseteq \mathbb{R}$.
+The \emph{internal set} $[A_n]$ is defined as follows:
+$$\text{$[r_n] \in [A_n]$ if and only if $\{ n \in \mathbb{N} : r_n \in A_n \} \in \mathcal{F}$.}$$
+
+The internal sets are precisely those which may be obtained in this way; they are ``the sets which exist in the model'', and they will turn out to be the sets over which we may quantify.
+
+Likewise an \emph{internal function} is obtained from a sequence $\langle f_n \rangle$ of real-valued functions $A_n \to \mathbb{R}$: $$[f_n]: [A_n] \to \hyp, [r_n] \mapsto [f_n(r_n)]$$
+
+\
+
+\begin{defn}
+We define the set of \emph{hypernaturals} to be the set $\hyp[\mathbb{N}]$ which is the image of the elementary embedding of $\mathbb{N} \subseteq \mathbb{R}$ into $\hyp$: that is, $$[r_n] \in \hyp[\mathbb{N}] \Leftrightarrow \{ n \in \mathbb{N}: r_n \in \mathbb{N} \} \in \mathcal{F}$$
+By construction, it is an internal subset of $\hyp$.
+\end{defn}
+
+\
+
+\begin{remark}There is an extended form of the transfer principle (where second-order statements may be transferred), which is even more difficult to justify than our original statement\footnote{For which, recall, we appealed to the power of \L os's Theorem.} of Definition \ref{defn:transfer}.
+It allows us to translate between certain second-order statements: $$(\forall A \subseteq B) \leftrightarrow (\forall \text{$A$ internal} \subseteq \hyp[B])$$ 
+This procedure can be made to result in a formulation which is agnostic with respect to how we constructed the hyperreals, but in this essay we have only sketched a motivation, and have worked within the ultrapower construction.
+See Chapter 13 of Goldblatt \cite{goldblatt} for the details.
+
+Later on, when we treat measure theory, we will make heavy use of this ``restricted second-order'' transfer principle.
+
+The definition of ``internal'' here was very much dependent on the implementation of $\hyp$ as an ultrapower.
+However, it may be viewed more generally; this is the start of ``Internal Set Theory''. We will elide such details.
+\end{remark}
+
+\
+
+\begin{defn}[Transfer Principle, extended] \label{defn:secondordertransfer}
+Let $\phi$ be a first-order sentence in the language of the totally ordered field $\mathbb{R}$, which is additionally allowed to mention (finitely many) specific sets $A_n \subseteq \mathbb{R}$, and is allowed to contain quantifiers $(\forall A \subseteq \mathbb{R})$ and $(\exists A \subseteq \mathbb{R})$.
+Then $\phi$ is true in $\mathbb{R}$ if and only if $\hyp[\phi]$ is true in $\hyp$, where $\hyp[\phi]$ is obtained by \begin{enumerate}
+\item replacing all quantifiers $(\forall x \in \mathbb{R})$ with $(\forall x \in \hyp)$ and $(\exists x \in \mathbb{R})$ with $(\exists x \in \hyp)$;
+\item replacing each $A_n$ with $\hyp[A_n]$;
+\item replacing all quantifiers $(\forall A \subseteq \mathbb{R})$ with $(\forall \text{$A$ internal} \subseteq \hyp)$ and likewise $(\exists A \subseteq \mathbb{R})$ with $(\exists \text{$A$ internal} \subseteq \hyp)$.
+\end{enumerate}
+\end{defn}
+
+\
+
+By transfer, hypernaturals have several obvious properties:
+
+\begin{itemize}
+\item They are closed under addition.
+\item There are no hypernaturals between $m$ and $m+1$, for $m$ hypernatural.
+\item For every $x \in \hyp$, have $x \in \hyp[[] \hyp[\lfloor] x \rfloor, \hyp[\lfloor] x \rfloor+1]$.
+\end{itemize}
+
+Every hypernatural is either standard natural, or bigger than all standard naturals; this can be seen from the (transferred) fact that subtracting $1$ from a nonzero hypernatural yields another hypernatural, and the (transferred) fact that all hypernaturals are nonnegative.
+
+\begin{example}It is a second-order expressible fact in the reals that every nonempty finite set has a least element:
+$$(\forall A \subseteq \mathbb{R})((\exists n \in \mathbb{N})(\text{$A$ has $n$ elements and $n>0$}) \Rightarrow (\exists x \in A)(\forall y \in A)(x \leq y))$$
+Here, we use a shorthand: $$(\text{$A$ has $n$ elements}) \leftrightarrow (\text{$\exists$ a bijective function $\{x \in \mathbb{N}: x < n \} \to A$})$$
+
+The transfer principle from Definition \ref{defn:transfer} does not apply.
+But our amended second-order version does apply, to give us
+$$(\forall \text{$A$ internal} \subseteq \hyp)((\exists n \in \hyp[\mathbb{N}])(\text{$A$ has $n$ elements and $n>0$}) \Rightarrow (\exists x \in A)(\forall y \in A)(x \leq y))$$
+where $$(\text{$A$ has $n$ elements}) \leftrightarrow (\text{$\exists$ a bijective internal function $\{x \in \hyp[\mathbb{N}]: x < n\} \to A$})$$
+
+That is, internal hyperfinite sets have least elements.
+
+In fact, if we work in the ultrapower construction, the minimal element of the internal set $[A_n]$ is $[a_n]$, where for each $n \in \mathbb{N}$, $a_n$ is the least element of $A_n$.
+(We will not prove this.)
+
+Additionally, if $m$ is a hypernatural and $x_1, x_2, \dots, x_m$ is an internal set of hyperreals, then there is a maximum $x_i$.
+\end{example}
+
+\subsection{Hypersequences}
+
+We may define \emph{hypersequences}, by means of transferring a function $f: \mathbb{N} \to \mathbb{R}$ to a function $\hyp[f]: \hyp[\mathbb{N}] \to \hyp$.
+(We will assume that we can always extend $f$, whether or not the transfer principle applies to our particular choice of $f$.
+This requirement is justifiable; it is studied in a little more detail in Section \ref{sec:comprehensiveness}.)
+The notion of a hypersequence leads to a very neat characterisation of the convergence of a sequence.
+
+\
+
+\begin{defn} \label{defn:convergence} If $f: \mathbb{N} \to \mathbb{R}$, have $(f(n))_{n \in \mathbb{N}} \to x \in \mathbb{R}$ if and only if $\hyp[f](k) \near x$ for all $k$ infinite. (Recall that $\hyp[f]$ maps from $\hyp[\mathbb{N}]$ to $\hyp$.)
+\end{defn}
+
+\
+
+Of course, from \emph{within} the model, the statement ``for all infinite $k$'' is not meaningful, because the set of infinite naturals is not internal.
+
+\
+
+\begin{thm} \label{thm:infinite_not_internal}
+The set of infinite hypernaturals is not internal.
+\end{thm}
+\begin{proof}
+Every non-empty internal set of hypernaturals has a smallest element.
+This is Exercise 1 from Section 12.4 of Goldblatt \cite{goldblatt}, and it follows by transferring the true statement of the well-ordering of the naturals:
+$$(\forall A \subseteq \mathbb{N})(\exists n \in A)(\forall m \in A)(n \leq m)$$
+to
+$$(\forall \text{$A$ internal} \subseteq \hyp[\mathbb{N}])(\exists n \in A)(\forall m \in A)(n \leq m)$$
+
+But there is no smallest infinite hypernatural, because subtracting $1$ from any infinite hypernatural yields another infinite hypernatural.
+\end{proof}
+
+\
+
+\begin{thm} \label{thm:convergenceequivalent} The non-standard and the standard definitions of convergence coincide: if (and only if) $(f(n)) \to x$ in the non-standard sense of Definition \ref{defn:convergence}, then for every $\varepsilon \in \mathbb{R}^{>0}$ there is $N \in \mathbb{N}$ such that for all $n > N$, $|f(n) - x| < \varepsilon$.
+\end{thm}
+\begin{proof}
+If the sequence $(f(n))$ converges to $x$ in the non-standard sense, then for every $\varepsilon \in \mathbb{R}^{>0}$ we have all infinite $N \in \hyp[\mathbb{N}]$ satisfying 
+$$\text{for all $n > N$, $|\hyp[f](n) - x| < \varepsilon$}$$
+
+Therefore it must be the case that some $N \in \mathbb{N}$ has this same property transferred to the reals:
+$$\text{for all $n > N$, $|f(n) - x| < \varepsilon$}$$
+since if not, this would be an internal property that distinguished between finite $N$ and infinite $N$; this contradicts Theorem \ref{thm:infinite_not_internal}.
+
+Conversely, suppose the sequence $(f(n))$ converges to $x$ in the standard sense.
+Fix some $\varepsilon \in \mathbb{R}^{>0}$.
+Then there is some particular $N_{\varepsilon}$ - say, for the sake of argument, $N_{\varepsilon} = 10$ - such that all larger $n \in \mathbb{N}$ have $|f(n) - x| < \varepsilon$.
+
+This property transfers to the hyperreals: for all $n \in \hyp[\mathbb{N}]$ with $n > N_{\varepsilon}$ (which, for the sake of argument, is $10$), we have $$|\hyp[f](n)-x| < \varepsilon$$
+In particular, all infinite hypernaturals $n$ satisfy $|\hyp[f](n) - x| < \varepsilon$.
+
+Finally, allowing $\varepsilon$ to vary over all positive reals, we discover that for all infinite $n \in \hyp[\mathbb{N}]$, it is the case that $\hyp[f](n) \near x$.
+\end{proof}
+
+\subsection{Lattices}
+
+Hypernaturals yield a succinct proof of the Intermediate Value Theorem, by means of considering a ``hyperfinite lattice'' of points on the real line.
+We examine the behaviour on that lattice of a $\mathbb{R}$-continuous function when it is extended to $\hyp$, and gain access to the nice properties of hyperfinite sets.
+The following proof is from P\'etry \cite{petry}, where it appears as Theorem 25.
+
+\
+
+\begin{thm}
+Let $f: [a, b] \to \mathbb{R}$ be continuous with $f(a) < 0 < f(b)$. Then there is $c$ such that $f(c) = 0$.
+\end{thm}
+\begin{proof}
+Extend $f$ to $\hyp[f]$, and consider the ``hyperpartition'' of $[a,b]$ $$S = \left \{ \frac{b-a}{m} k + a : 0 \leq k \leq m \right\}$$ for $m$ a fixed infinite hypernatural.
+
+Construct $$T = \left \{ \hyp[f](x): x \in S, \hyp[f](x) > 0 \right \}$$
+
+Then $\bar{k} := \min \{ x \in S: \hyp[f](x) \in T \}$ has $$\st \hyp[f]\left(\bar{k} \right) = 0$$
+since certainly it is $\geq 0$ by definition as (the standard part of) a member of a set $T$ of positive numbers, while if it were strictly greater than $0$ then we could subtract $\frac{b-a}{m}$ from $\bar{k}$ to obtain another member $\kappa$ of $S$ such that $\hyp[f](\kappa) \in T$, contradicting minimality of $\bar{k}$.
+$\bar{k}$ does exist, because it is the minimum of a hyperfinite set.
+\end{proof}
+
+(This proof can be converted into another non-standard one which does not use hypernaturals, instead using the least upper bound property of the standard reals.)
+
+We are now ready to revisit Theorem \ref{thm:continuouscompact} in a more concrete form.
+
+\
+
+\begin{thm} \label{thm:ACFOACBIIBAAIB} Let $f: [a, b] \to \mathbb{R}$ be continuous. Then $f$ is bounded and attains its bounds.
+\end{thm}
+\begin{proof}
+Extend $f$ to $\hyp[f]$.
+
+Then for $m$ a hyperfinite integer, $$S = \left \{ \frac{b-a}{m} k + a : 0 \leq k \leq m \right\}$$ is a hyperfinite set and so $\hyp[f]$ attains a maximum and a minimum on that set; say at $m_+, m_-$ respectively.
+Since $[a,b]$ is bounded, we must have $\hyp[[]a, b]$ bounded, and so $m_+$ and $m_-$ are finite.
+
+Now, if $\hyp[f](m_+)$ is infinite, then $\st(\hyp[f](m_+)) = f(\st(m_+))$ would be infinite too (by continuity), which is a contradiction unless $\st(m_+)$ lies outside $[a,b]$.
+But this can never happen because $[a,b]$ is closed: since $m_+ \geq a$, we must have $\st(m_+) \geq \st(a) = a$, and likewise since $m_+ \leq b$, we must have $\st(m_+) \leq \st(b) = b$.
+
+Therefore $\hyp[f](m_+)$ is finite; so $\hyp[f]$ is bounded above on $S$ and attains its bound, at $m_+$.
+Hence by continuity $f$ is bounded above and attains its bound at $\st(m_+)$, which we have already shown is in the domain $[a,b]$.
+
+Exactly the same argument shows that $f$ is bounded below and attains its bound.
+\end{proof}
+
+\begin{remark}
+The proof of Theorem \ref{thm:ACFOACBIIBAAIB} is so short and concise that it becomes extremely clear what its real content is: namely, that closed bounded intervals are compact (in the sense of Definition \ref{defn:compact}).
+Most of the proof is simply showing that $m_+$ and $m_-$ must have standard parts in the domain of $f$, which is precisely what it means for $[a,b]$ to be compact.
+\end{remark}
+
+We move on to the related Rolle's Theorem.
+
+\
+
+\begin{thm}[Rolle's Theorem] \label{thm:rolle} Let $f: [a,b] \to \mathbb{R}$ be differentiable on $(a,b)$ and continuous on $[a,b]$.
+Suppose that $f(a) = f(b)$.
+Then there is $c \in (a,b)$ such that $f'(c) = 0$. 
+\end{thm}
+\begin{proof}
+The following proof is from Section 8.5 of \cite{goldblatt}.
+Since $f$ is continuous on a closed bounded interval, it is bounded and attains its bounds (Theorem \ref{thm:ACFOACBIIBAAIB}).
+If $f(x) = f(a) = f(b)$ for all $x$, then we are done: $f$ is constant and so has zero derivative everywhere.
+Otherwise, without loss of generality, $f$ attains a global maximum at $x \not \in \{a, b\}$, say.
+(If in fact $f(a)$ is a global maximum, then consider $-f$ instead.)
+
+Now, it is a first-order fact that $f(y) \leq f(x)$ for every $y \in [a,b]$; so by transfer, $x$ maximises $\hyp[f]$.
+
+Therefore $$\frac{f(x+\varepsilon) - f(x)}{\varepsilon} \leq 0 \leq \frac{f(x+\delta) - f(x)}{\delta}$$
+for any $\varepsilon > 0, \delta < 0$ both infinitesimal.
+
+Since the left-hand side and right-hand side are both infinitesimally close to each other, on taking standard parts we obtain that $f'(x)$ is both nonnegative and nonpositive, so it must be $0$.
+\end{proof}
+
+The Mean Value Theorem and then Taylor's theorem can be proved in an $\varepsilon$-$\delta$ free way from Rolle's theorem (for example, as in Theorem 4 of Chapter 11 in Spivak \cite{spivak}).
+
+\subsection{Hyper-sums} \label{sec:hypersums}
+
+Continuing the theme of the hypernaturals, we investigate \emph{hyper-sums}.
+
+Let $S(n) = \sum_{i=0}^n f(i)$, for $f: \mathbb{N} \to \mathbb{R}$.
+This function $S$ extends to a function $\hyp[S]: \hyp[\mathbb{N}] \to \hyp$, since we may express $S$ in a transferrable way as $$S(0) = f(0); \ (\forall n \in \mathbb{N}^{>0})(S(n) = S(n-1) + f(n))$$
+and then (using our second-order transfer principle) show that there is only one $\hyp[S]$ which satisfies the transferred condition.
+
+The transfer principle yields properties such as \begin{equation}\label{sums} \hyp[|] \sum_{k=0}^m \lambda_k u_k| \leq (\max \hyp[|] u_k|) \sum_{k=0}^m \hyp[|] \lambda_k|\end{equation}
+where for clarity we have implicitly suppressed the asterisk on the $\hyp[\sum]$ symbol.
+
+\section{Integration}
+
+The definition of the Riemann integral is made especially comprehensible by the notion of the hyper-sum.
+Taking the standard method of approximating an integral by the area of rectangles, and then taking the number of rectangles to be larger and larger and eventually infinite (i.e. hyperfinite), is a highly intuitive idea.
+
+The ``obvious'' choice of the definition of $\int_a^b f$ would be $$\st \left( \sum_{k=0}^{m-1} \hyp[f](x_k) (x_{k+1}-x_k)\right)$$
+where $m$ is some hyperfinite integer, and $$x_k = \frac{b-a}{m} k + a$$
+
+However, a little thought suggests that some rather pathological functions would thereby be considered to have very wrong integrals, because we can only ever sample $\hyp[f]$ at some fixed points; letting our function misbehave away from those points would yield counterintuitive results.
+
+The correct refinement is as follows.
+
+\
+
+\begin{defn}
+The \emph{integral} of $f: [a,b] \to \mathbb{R}$ is the following expression, if it is well-defined:
+$$\int_a^b f = \st \left( \sum_{k=0}^{m-1} \hyp[f](\hyp[\phi](x_k, x_{k+1})) (x_{k+1}-x_k) \right)$$
+where $\phi$ is any function $[a, b]^2 \to \mathbb{R}$ such that $r \leq \phi(r, s) \leq s$, and $(x_{k+1} - x_k) = \frac{1}{m}$, and $m$ is an infinite hypernatural.
+\end{defn}
+
+\
+
+This captures the idea that our $m$ sampling points are allowed to vary their position slightly in their respective intervals.
+
+We say a function $f: [a, b] \to \mathbb{R}$ is \emph{integrable} if $\int_a^b f$ is well-defined as hyperfinite $m$ varies and for all choices of $\phi$.
+
+Showing that a function is integrable is approximately as difficult using the non-standard definition as it is using the standard definition (as a limit of a Riemann sum taken over smaller and smaller dissections).
+However, the non-standard definition is perhaps conceptually a little simpler, because it lacks a limiting process.
+
+To illustrate the process of showing a function is integrable, we prove that continuous functions are integrable.
+The proof here, rendered down from P\'{e}try's (\cite{petry}, Section 12.5), is very similar to a standard proof.
+
+\
+
+\begin{thm}
+Let $f: [a,b] \to \mathbb{R}$ be continuous. Then $f$ is integrable.
+\end{thm}
+\begin{proof}
+We need to show that given two different discretisations $(x_k)_{k=0}^m$ and $(y_k)_{k=0}^n$, and two ``nearness'' functions $\phi$ and $\psi$, the following is true:
+$$\sum_{k=0}^{m-1} \hyp[f](\hyp[\phi](x_k, x_{k+1}))(x_{k+1}-x_k) \near \sum_{k=0}^{n-1} \hyp[f](\hyp[\psi](y_k, y_{k+1})) (y_{k+1}-y_k)$$
+
+Consider the more general discretisation given by taking the union of the $x_i$ and $y_i$: label this list $(w_i)_{i=0}^l$.
+(Note that this is no longer ``uniform'': the $w_i$ do not necessarily have equal intervals between them, although the $x_i$ and $y_i$ did.)
+We will suppress the asterisk on $\hyp[[]\alpha, \beta]$ henceforth.
+
+Each $[w_i, w_{i+1}]$ lies fully within some $[x_j, x_{j+1}]$, by construction of the $w_i$, so $$[x_k, x_{k+1}] = [w_{i_k}, w_{i_k+1}] \cup \dots \cup [w_{r_k-1}, w_{r_k}]$$
+for some $i_k, r_k$.
+
+Therefore, suppressing the asterisk on $\hyp[\phi](x_m, x_{m+1})$, we may un-telescope the sum:
+$$\hyp[f](\phi(x_k, x_{k+1})) (x_{k+1} - x_k) = \sum_{j=i_k}^{r_k-1} \hyp[f](\phi(x_k, x_{k+1}))(w_{j+1}-w_j)$$
+so
+$$\sum_{k=0}^{m-1} \hyp[f](\phi(x_k, x_{k+1})) (x_{k+1} - x_k) = \sum_{k=0}^{m-1} \sum_{j=i_k}^{r_k-1} \hyp[f](\phi(x_k, x_{k+1})) (w_{j+1}-w_j)$$
+
+Now, since $x_k \near x_{k+1}$ and $w_j, w_{j+1}$ are both in $[x_k, x_{k+1}]$, we have $$\phi(x_k, x_{k+1}) \near w_j \near w_{j+1}$$
+Hence in fact the right-hand side is an expression for a Riemann sum with $(w_i)$ as a dissection, although recall that the dissection does not have equal intervals between successive points.
+
+Relabelling the sum on the right-hand side, for some $(c_k)_{k=0}^l$ (which, if we were so inclined, we could express in terms of $\phi$ and the $x_i$), we have $$\sum_{k=0}^{m-1} \hyp[f](\phi(x_k, x_{k+1}))(x_{k+1}-x_k) = \sum_{k=0}^{l-1} \hyp[f](c_k) (w_{k+1}-w_k)$$
+
+Symmetrically, $$\sum_{k=0}^{n-1} \hyp[f](\psi(y_k, y_{k+1})) (y_{k+1}-y_k) = \sum_{k=0}^{l-1} \hyp[f](d_k) (w_{k+1}-w_k)$$ for some $(d_k)_{k=0}^m$ with each $c_k \near d_k$.
+Notice that the upper limit of this sum is indeed the same $l-1$ as before, because the dissection is taken over the same sequence $(w_i)$.
+
+Taking the modulus of the difference of the two expressions, obtain $$\left \vert \sum_{k=0}^{l-1} (\hyp[f](c_k) - \hyp[f](d_k)) (w_{k+1} - w_k) \right \vert$$
+
+But $f$ is continuous on a compact set, so is uniformly continuous (see Section \ref{sec:uniform}); so $\hyp[f](c_k) - \hyp[f](d_k)$ is infinitesimal for all $k$, because $c_k \near d_k$.
+
+By equation \ref{sums} in Section \ref{sec:hypersums}, for every $\varepsilon \in \mathbb{R}^{> 0}$ we have
+$$\left \vert \sum_{k=0}^{l-1} (\hyp[f](c_k) - \hyp[f](d_k)) (w_{k+1} - w_k) \right \vert \leq \varepsilon \sum_{k=0}^{l-1} |w_{k+1} - w_k|$$
+
+Therefore the two expressions for the integral are indeed infinitesimally close, since $$\sum_{k=0}^{l-1} |w_{k+1}-w_k| = \sum_{k=0}^{l-1} (w_{k+1}-w_k) = b-a$$
+\end{proof}
+
+Before we introduce the link between integration and differentiation (the Fundamental Theorem of Calculus), we first require a lemma, which is P\'etry's Theorem 32.
+
+\
+
+\begin{thm}[Integral mean value theorem] \label{thm:integralmvt}
+Let $f: [a, b] \to \mathbb{R}$ be continuous.
+Then there is a real $u \in [a,b]$ such that $$\int_a^b f(x) dx = (b-a) f(u)$$
+\end{thm}
+\begin{proof}
+Since $f$ is continuous on a closed bounded interval, it attains its bounds; say $f(c) \leq f(x) \leq f(d)$ for all $x$.
+
+Now, $(b-a) f(c) \leq S(\delta) \leq (b-a) f(d)$
+for any Riemann sum $S(\delta)$ with box-width $\delta$, so $$f(c) \leq \frac{1}{b-a} \int_a^b f(x) dx \leq f(d)$$
+
+Then we are done by the Intermediate Value Theorem: there is $u \in [c, d]$ such that $$f(u) = \frac{1}{b-a} \int_a^b f(x) dx$$
+\end{proof}
+
+\
+
+\begin{thm}[Fundamental Theorem of Calculus, first part] \label{thm:FTC1}
+Let $f: [a,b] \to \mathbb{R}$ be continuous, and $x_0 \in [a,b]$.
+Then the function $$g: x \mapsto \int_{x_0}^x f(t) dt$$ is differentiable on $(a,b)$ with derivative $g'(x) = f(x)$.
+That is, an antiderivative of $f$ is given by the integral.
+\end{thm}
+\begin{proof}
+Let $\delta$ be infinitesimal.
+Then $$\frac{\hyp[g](x+\delta) - \hyp[g](x)}{\delta} = \frac{1}{\delta} \int_x^{x+\delta} f(t) dt$$
+
+By transferring the integral mean value theorem (Theorem \ref{thm:integralmvt}), there is $w \in \hyp[[]x, x+\delta]$ such that $$\frac{1}{\delta} \int_x^{x+\delta} f(t) dt = \hyp[f](w)$$
+
+On taking standard parts and using continuity, we obtain $$\st \left( \frac{\hyp[g](x+\delta) - \hyp[g](x)}{\delta} \right) = \st(\hyp[f](w)) = f(x)$$
+\end{proof}
+
+The first part of the FTC told us how to find an antiderivative by integrating.
+There is a second part to the FTC, which will tell us how to integrate $f$ in terms of a known antiderivative.
+To prove it, we shall require a standard theorem on antiderivatives.
+
+\
+
+\begin{thm} \label{thm:antiderivativesunique} Antiderivatives are unique up to the addition of a constant.
+That is, if $H_1, H_2: [a, b] \to \mathbb{R}$ satisfy $H_i' = f$, then $H_1 = H_2 + k$ for some constant $k$.
+\end{thm}
+\begin{proof}
+Consider $H_1 - H_2: [a,b] \to \mathbb{R}$.
+This function has derivative $0$ at all points.
+By the Mean Value Theorem, this means $H_1 - H_2$ is constant.
+(This follows from the remark after Theorem \ref{thm:increasingimpliesderivativepositive}, by which we deduce that $H_1 - H_2$ is both nondecreasing and nonincreasing.)
+\end{proof}
+
+\
+
+\begin{thm}[FTC, second part] \label{thm:FTC2}
+Let $f: [a,b] \to \mathbb{R}$ be continuous, and suppose $F: [a,b] \to \mathbb{R}$ is an antiderivative for $f$ (so $F' = f$).
+Then
+$$\int_a^b f = F(b) - F(a)$$
+\end{thm}
+\begin{proof}
+Break the integral up at the point $x_0$, and define $$G(x) = \int_{x_0}^x f$$
+
+By the first part of the FTC (Theorem \ref{thm:FTC1}), $G$ is an antiderivative for $f$; so since $F$ and $G$ are both antiderivatives, they differ by a constant (Theorem \ref{thm:antiderivativesunique}): $$F(x)+c = G(x)$$
+Therefore $$\int_a^b f = \int_a^{x_0} f + \int_{x_0}^b f = -G(a) + G(b) = F(b)-F(a)+c-c$$
+where the transformation $$\int_a^b f = \int_a^{x_0} f + \int_{x_0}^b f$$ follows from splitting up the Riemann sum.
+(Because the integral is well-defined, we are free to choose a convenient Riemann sum where $x_0$ is a point of the discretisation, so that the sum splits up perfectly into two chunks.)
+\end{proof}
+
+\
+
+\begin{remark}
+One consequence of this theorem is that if $f'$ is continuous between $a$ and $b$, then its integral is $f(b) - f(a)$.
+\end{remark}
+
+\
+
+\begin{defn}[Improper integral]
+We write $\int_a^{\infty} f(x) dx$ for the expression $$\st \left( \int_a^M f(x) dx \right)$$
+where $M$ is an arbitrary infinite positive hyperreal, if that expression is finite and well-defined as $M$ varies.
+\end{defn}
+
+\
+
+\begin{example}
+When does $\int_a^{\infty} x^{\theta} dx$ exist?
+Assuming $\theta \not = -1$, the integral is $$\st \left( \int_a^M x^{\theta} dx \right) = \st \left( \left[\frac{x^{\theta + 1}}{\theta + 1} \right]_a^{M} \right) = \st \left( \frac{M^{\theta+1}}{\theta+1} - \frac{a^{\theta+1}}{\theta+1} \right)$$
+
+This is well-defined if and only if $\theta+1 < 0$, in which case its value is $\frac{-a^{\theta+1}}{\theta+1}$.
+
+If instead $\theta = -1$, the integral is $\st(\log(M) - \log(a))$, which is infinite, so the integral is not defined in this case either.
+\end{example}
+
+\section{Series}
+
+Intuitively, since series are simply infinite sums, it should be the case that hyperfinite sums express series neatly.
+This turns out to be the case.
+We are still assuming throughout that we may extend standard sequences to non-standard sequences; see further discussion in Section \ref{sec:comprehensiveness}.
+
+\
+
+\begin{defn} Let $c: \mathbb{N} \to \mathbb{R}$ by $k \mapsto c_k$. 
+We say $$\sum_{i=0}^{\infty} c_k$$ \emph{converges} iff $$\st \left( \sum_{k=0}^m \hyp[c]_k \right)$$ is finite and is well-defined as $m$ varies over all infinite hypernaturals in $\hyp[\mathbb{N}]$.
+\end{defn}
+
+\
+
+Two of the standard examples of infinite sums are $$\sum_{k=1}^{\infty} \frac{1}{2^k}$$ and $$\sum_{k=1}^{\infty} 1$$
+The former, of course, converges.
+In this instance, it is a fact that $$\sum_{k=1}^{m} \frac{1}{2^k} = 1-2^{-m}$$
+and this fact is true in the limited second-order sense of Section \ref{sec:internal},
+so it remains true when we transfer to infinite $m$; in particular, then $2^{-m}$ is infinitesimal, so the standard part of our resulting sum is simply $1$.
+
+For the latter sum (that is, the sum of infinitely many of the constant $1$), we have $$\sum_{k=1}^{m} 1 = m$$ which has infinite standard part when $m$ is infinite; so in this instance, as expected, the sum fails to converge.
+
+To understand convergence, the following result is very useful; it basically states that a sequence is Cauchy if and only if it converges, in the specific case that the sequence is a sequence of partial sums of a series.
+
+\
+
+\begin{thm}[Cauchy's criterion] \label{thm:cauchycriterion} $\sum_{k=1}^{\infty} a_k$ converges if and only if $$\sum_{k=m}^n \hyp[a]_k$$ is infinitesimal for all $m \leq n$ infinitely large.
+\end{thm}
+\begin{proof}
+This proof is from P\'etry \cite{petry}, section 19.2, where it appears as Theorem 53.
+
+Suppose $\sum_{k=1}^{\infty} a_k$ converges to $a$.
+Then $$\sum_{k=m}^n \hyp[a]_k = \sum_{k=1}^n \hyp[a]_k - \sum_{k=1}^{m-1} \hyp[a]_k \near a-a = 0$$
+
+Conversely, suppose $$\sum_{k=m}^n \hyp[a]_k$$ is infinitesimal for all $m \leq n$ infinite.
+We need $\sum_{k=1}^m \hyp[a]_k$ to have the same, finite, standard part as $\sum_{k=1}^n \hyp[a]_k$ for all $m < n$ infinite.
+
+Clearly they have the same standard part if both sums are finite, because when we subtract them, we obtain $$\sum_{k=m+1}^{n} \hyp[a]_k$$ which is infinitesimal by assumption.
+So it remains to show that they are indeed finite.
+
+Let $\hyp[n]$ be some fixed infinite hypernatural (which we decorate with the asterisk as a cue for the fact that is infinite).
+For all infinite $m < \hyp[n]$, we have that $$\left| \sum_{k=m}^{\hyp[n]} \hyp[a]_k \right| < 1$$
+(In fact, we have much more: we have that the left-hand side is infinitesimal.)
+
+Since the property $$P(m) = \left[ (m < \hyp[n]) \rightarrow \left( \left| \sum_{k=m}^{\hyp[n]} \hyp[a]_k \right| < 1 \right) \right]$$ is internal, it cannot suffice by itself as a means of distinguishing between finite and infinite integers $m$.
+(Indeed, no such means exists, by Theorem \ref{thm:infinite_not_internal}.)
+So there must be a finite natural $p$ such that $P(p)$ holds: $$\left| \sum_{k=p}^{\hyp[n]} \hyp[a]_k \right| < 1$$
+
+Therefore $\sum_{k=1}^{\hyp[n]} \hyp[a]_k$ is finite, being the sum of two finite quantities $$\sum_{k=1}^{p-1} \hyp[a]_k + \sum_{k=p}^{\hyp[n]} \hyp[a]_k$$
+\end{proof}
+
+\begin{example}[The harmonic series]
+$$\sum_{k=m+1}^{2m} \frac{1}{k} \geq m \times \frac{1}{2m} = \frac{1}{2}$$
+which is not infinitesimal when $m$ is infinite, so Cauchy's criterion fails for the harmonic series.
+(This is basically the usual proof by Cauchy condensation.)
+\end{example}
+
+\
+
+\begin{thm}Absolute convergence implies convergence.
+\end{thm}
+\begin{proof}
+Because $$\left | \sum_{k=m}^n a_k \right | \leq \sum_{k=m}^n |a_k|$$ (for $n, m$ either infinite or standard integers), the result is immediately clear from Cauchy's criterion.
+\end{proof}
+
+The comparison test likewise follows by transferring the fact that $$\sum_{k=m}^n a_k \leq \sum_{k=m}^n b_k$$ whenever $a_k \leq b_k$ for all $k \in [m, n]$.
+
+\pagebreak
+
+\begin{thm}[Ratio test] Let $a_k$ be a sequence of reals.
+\begin{enumerate}
+\item If there is some real $L$ such that for all infinitely large $m$, $$\left | \frac{a_{m+1}}{a_m} \right | \leq L < 1$$ then $\sum_{k=1}^{\infty} a_k$ converges absolutely.
+\item If instead for all infinite $m$ we have $$\left | \frac{a_{m+1}}{a_m} \right | \geq 1$$ then the sum diverges.
+\end{enumerate}
+\end{thm}
+\begin{proof}
+We prove only the first of these, since the second is almost identical in proof.
+Notice that we are omitting the asterisk of $\hyp[a]_{m+1}$, to make a more readable theorem statement.
+
+Using the idea from Theorem \ref{thm:cauchycriterion} that ``for all $m > m_0$, have $\left| \frac{a_{m+1}}{a_m} \right| \leq L$'' cannot be a way to distinguish those $m_0$ which are infinite from those $m_0$ which are finite, there must be some $m_0$ finite with $$\left| \frac{a_{m+1}}{a_m} \right| \leq L$$ for all $m > m_0$.
+Then we simply proceed by comparison with the convergent geometric series with common ratio $L$.
+\end{proof}
+
+Notice that this easily implies the standard statement of the ratio test, because if $$\frac{a_{m+1}}{a_m} \to L < 1$$ as $m \to \infty$, then for all infinitely large $m$, have $$\frac{a_{m+1}}{a_m} \near L < \frac{1+L}{2} < 1$$
+
+\begin{remark}
+The non-standard formulation of the ratio test is a little more clumsy in its proof than the standard version, because it essentially states that ``it is enough to pass to the standard version'' and then proves the standard version by comparison.
+However, the non-standard version has the aesthetic benefit of being free of any explicit limits.
+\end{remark}
+
+\
+
+\begin{thm}[Alternating series test]
+Let $(a_n)$ be a sequence of positive reals which are decreasing to $0$.
+Then $$\sum_{k=1}^{\infty} (-1)^k a_k$$ converges.
+\end{thm}
+\begin{proof}
+This proof is derived from Theorem 59 of P\'etry \cite{petry}.
+
+Let $m, n$ be infinite hypernaturals.
+The sum $$S = a_m - a_{m+1} + a_{m+2} - \dots + (-1)^{n-m} a_n$$ is precisely one of the two following: $$a_m - (a_{m+1} - a_{m+2}) - \dots - (a_{n-2} - a_{n-1}) - a_n$$ or $$a_m - (a_{m+1} - a_{m+2}) - \dots - (a_{n-3} - a_{n-2}) - (a_{n-1} - a_n)$$
+depending on the parity of $n$.
+Because the $a_i$ are decreasing, the result must be less than $a_m$ in either case, since each bracketed term is nonnegative.
+If we omit the first term, we obtain a quantity $$-S' := S - a_m = -(a_{m+1} - a_{m+2} + \dots + (-1)^{n-m+1} a_n)$$ where $S'$ is less than $a_{m+1}$, so $-S'$ is greater than $-a_{m+1}$.
+Hence in fact $S \geq a_m - a_{m+1} \geq 0$, so $S$ is nonnegative.
+
+Therefore $$S = \left | \sum_{k=m}^n (-1)^k a_k \right | \leq a_m$$
+
+Since $(a_n)$ converges to $0$, for infinite $M$ we have $a_M \near 0$, so $\sum_{k=M}^N (-1)^k a_k$ is infinitesimal (being bounded in modulus by $a_M$).
+We are therefore done by Cauchy's criterion (Theorem \ref{thm:cauchycriterion}).
+\end{proof}
+
+We omit the integral test for convergence, because it is a routine application of similar ideas to the above; it may be found in P\'etry, section 19.3 \cite{petry}.
+
+\section{More general topological ideas}
+
+In this section, we will discuss how the more abstract ideas of topology can be viewed in the non-standard setting of $\hyp^n$, the product of $n$ copies of $\hyp$.
+Although we will not prove that the transfer principle holds between $\mathbb{R}^n$ and $\hyp^n$, it is intuitive that $(\hyp)^n$ has some of the properties we would like from $\hyp[(\mathbb{R}^n)]$: given any infinitesimal $\varepsilon \in \hyp$, we can obtain infinitesimals $\hat{\varepsilon} \in (\hyp)^n$ in any direction by simply multiplying by any unit vector, while given any infinitesimal $\hat{\varepsilon} \in (\hyp)^n$ we can take its length to get an infinitesimal in $\hyp$.
+(Length, of course, is defined by transferring the usual Euclidean distance.)
+In fact, it is the case that the monad of a point $(x, y)$ in a general product space is equal to the product of the monads; see Section III.1 of Hurd and Loeb \cite{hurdloeb}. 
+
+To be clear, then, two elements of $\hyp^n$ are infinitesimally close iff their norm is infinitesimal; equivalently, if and only if their coordinates are pointwise infinitesimally close.
+We define standard parts of vectors pointwise.
+
+\
+
+\begin{defn} \label{defn:open}
+A subset $X \subseteq \mathbb{R}^n$ is \emph{open} if and only if, for every $x \in X$, the monad of $x$ lies entirely in $\hyp[X]$.
+\end{defn}
+
+\
+
+\begin{remark}[Equivalence to the standard definitions]
+This non-standard definition is easily implied by the standard definition when stated as being a union of open balls.
+It implies the standard definition when stated as ``every point has a neighbourhood within the set'':
+if $x$ has monad entirely within $\hyp[X]$, then there is $\varepsilon > 0$ (for instance, any infinitesimal $\varepsilon$) such that all $y \in \hyp[X]$, with $|y-x| < \varepsilon$, lie within $\hyp[X]$.
+This property transfers to $\mathbb{R}^n$ by the reverse direction of the transfer principle.
+\end{remark}
+
+\
+
+\begin{defn} \label{defn:closed}
+A subset $X \subseteq \mathbb{R}^n$ is \emph{closed} if (and only if) its complement is open.
+That is, $X$ is closed if and only if, whenever $y \in \mathbb{R}^n \setminus X$, the monad of $y$ is entirely outside $\hyp[X]$.
+\end{defn}
+
+\
+
+\begin{thm} \label{thm:closeddefn} Let $X \subseteq \mathbb{R}^n$. Then $X$ is closed if and only if every convergent sequence in $X$ has its limit point within $X$. \end{thm}
+\begin{proof}
+Let $X$ be closed, and let $(x_i)_{i=1}^{\infty}$ be a sequence in $X$, tending to $x$.
+
+If $x \not \in X$, then $x \in \mathbb{R}^n \setminus X$, so the monad of $x$ lies entirely outside $\hyp[X]$.
+But $(x_i)$ converges to $x$, so all infinite hypernaturals $m$ have $x_m \near x$, and this is a contradiction because all $x_n \in X \subseteq \hyp[X]$ for $n$ finite.
+Since no internal property can distinguish finite hypernaturals from infinite hypernaturals, it must be the case that some infinite hypernatural $M$ has $x_M \in \hyp[X]$.
+
+Conversely, let $X$ be not closed.
+Then $\mathbb{R}^n \setminus X$ is not open, so there is $y \in \mathbb{R}^n \setminus X$ such that some $r \in \hyp[\mathbb{R}^n]$ has $\st(r) = y$ but $r \not \in \hyp[(\mathbb{R}^n \setminus X)]$.
+
+We claim that $y$ is a limit point of $X$.
+Indeed, fix some specific $\varepsilon \in \mathbb{R}^{\geq 0}$.
+Then the following statement is true: $$(\exists r \in \hyp[\mathbb{R}]^n )(r \in \hyp[X] \wedge |y-r| < \varepsilon)$$
+so by the second-order version of transfer (Definition \ref{defn:secondordertransfer}), $$(\exists r \in \mathbb{R}^n)(r \in X \wedge |y-r| < \varepsilon)$$
+Denote such an $r$ by $x_{\varepsilon}$.
+
+Finally releasing $\varepsilon$, $(x_{1/n})$ converges to $x$ in the $\varepsilon$-$\delta$ sense, and therefore in the non-standard sense (by Theorem \ref{thm:convergenceequivalent}).
+\end{proof}
+
+\begin{remark}
+The proof of Theorem \ref{thm:closeddefn} is somewhat clumsy: it requires explicit uses of real $\varepsilon \in \mathbb{R}$. From a certain point of view, the proof contains two uses of the transfer principle: once to generate the sequence $(x_{1/n})$ which converges in the $\varepsilon$-$\delta$ sense, and once in the statement that $\varepsilon$-$\delta$ convergence is equivalent to convergence in the sense of Definition \ref{defn:convergence}.
+(This latter usage is hidden away in the proof of Theorem \ref{thm:convergenceequivalent}.)
+\end{remark}
+
+\
+
+\begin{thm}[Robinson's theorem] Let $X \subseteq \mathbb{R}^n$. Then the following are equivalent:
+\begin{enumerate} 
+\item \label{item:non-standard} $X$ is compact in the non-standard sense that every point $x \in \hyp[X]$ has a standard $r_x \in X$ to which it is infinitesimally close.
+\item \label{item:standard} $X$ is compact in the standard sense that every open cover has a finite subcover.
+\end{enumerate}
+\end{thm}
+\begin{proof}
+(\ref{item:standard}) $\Rightarrow$ (\ref{item:non-standard}):
+This direction of the proof is from Theorem 4.1.13 of Robinson \cite{robinson}.
+
+Suppose $x \in \hyp[X]$ has the property that no $r \in X$ has $r \near x$.
+The idea is to transfer the fact that ``there is a finite collection of points which together are near to every point'', for a contradiction.
+
+For each $r \in X$ we can find a ball $B_r$ around $r$, of positive standard-real radius $\varepsilon_r$, such that $\hyp[B_r]$ does not contain $x$
+(indeed, if not, then $r$ would be infinitesimally near to $x$).
+
+This collection of balls $B_r$ forms an open cover of $X$, so it has a finite subcover;
+but each ball $B_r$ can be specified in a first-order way as $\{ x \in X: d(x, r) < \varepsilon_r \}$, so we have the internal statement that $$X = B_{r_1} \cup B_{r_2} \cup \dots \cup B_{r_n}$$
+
+By transfer, this must be true of $\hyp[X]$ too: $$\hyp[X] = \hyp[B_{r_1}] \cup \dots \cup \hyp[B_{r_n}]$$ which is a contradiction because we built the $B_r$ such that no $\hyp[B_r]$ contained $x$.
+
+(\ref{item:non-standard}) $\Rightarrow$ (\ref{item:standard}):
+This direction of the proof is taken from Goldblatt \cite{goldblatt}, where it is given in Section 10.3.
+The proof is beautiful, but has the weakness that it does not extend to arbitrary topological spaces, because it relies on the presence of the rationals.
+(The result is true in general.)
+
+Suppose $X \subseteq \mathbb{R}^n$ is not compact in the standard sense.
+Since the product of compact spaces is compact, there must be some coordinate $i$ such that the $i$th projection $\pi_i(X)$ is not compact in the standard sense, so it is enough to work with $\pi_i(X) = X' \subseteq \mathbb{R}$.
+If we can deduce that there is some $x' \in X'$ whose standard part is not in $\hyp[X']$, then we can lift it up to any point $x \in X$ with $i$th coordinate equal to $x'$; the standard part of $x$ then does not lie in $\hyp[X]$.
+
+To reiterate, then, we are working with $X' \subseteq \mathbb{R}$ which is not compact in the standard sense.
+Let $(U_i)_{i=1}^{\infty}$ be an open cover of $X'$ without any finite subcover.
+We tweak each $U_i$ into an open interval whose endpoints are rational.
+
+Every $r \in X'$ lies within some $U_{i_r}$, say.
+Since $U_{i_r}$ is open, it contains an interval $C_r := (p_r, q_r)$ with rational endpoints, such that the interval contains $r$.
+This creates an open cover $$\mathcal{C} := \langle C_r : r \in X' \rangle$$
+such that every $C_r$ is entirely contained within some $U_{i_r}$.
+
+But there are only countably many such intervals, so we may in fact enumerate the open cover $\mathcal{C}$: say as $$\mathcal{C} = \langle (p_n, q_n) : n \in \mathbb{N} \rangle$$
+
+Certainly $\mathcal{C}$ covers $X'$, because every $r \in X'$ lies in its $C_r$, and $C_r$ is included in the enumeration.
+It has no finite subcover, because each $C_r$ is contained entirely within $U_{i_r}$, so that would imply a finite subcover from the $U_i$.
+
+But now it is true that $$(\forall k \in \mathbb{N})(\exists x \in X')(\forall n \in \mathbb{N})[n \leq k \Rightarrow x \not \in (p_n, q_n)]$$
+which precisely states that for all $k$, $$X' \not \subseteq (p_1, q_1) \cup \dots \cup (p_k, q_k)$$
+
+This is a statement which transfers to the hyperreals.
+Fix some infinite hypernatural $K$ (it does not matter which), and let $x \in \hyp[(X')]$ be such that for all $n \in \hyp[\mathbb{N}]$ with $n \leq K$, we have $x \not \in \hyp[(] p_n, q_n)$.
+Then for all finite $n$, we have $x \not \in \hyp[(] p_n, q_n)$.
+
+Finally, we claim that $x$ is our hyperreal in $\hyp[(X')]$ which has its standard part not contained in $X'$, thereby witnessing that $X'$ is not compact in the non-standard sense.
+Indeed, any $r \in X'$ is contained within some $(p_n, q_n)$, so if $x \near r$ then $p_n < x < q_n$, which would contradict the previous paragraph.
+\end{proof}
+
+\begin{thm}[Heine-Borel] The compact sets in $\mathbb{R}^n$ are precisely the closed bounded sets.
+\end{thm}
+\begin{proof}
+Let $X \subseteq \mathbb{R}^n$ be closed and bounded.
+Then take a point $x \in \hyp[X]$.
+$x$ is finite, because the statement that $X$ is bounded is a restricted second-order statement in the sense of Definition \ref{defn:secondordertransfer}, so it remains true of $\hyp[X]$ by transfer.
+Therefore $x$ has a standard part $\st(x) \near x$, which we claim lies in $X$.
+
+Indeed, if $\st(x)$ were not in $X$, then the monad of $\st(x)$ would lie outside $\hyp[X]$ (since $X$ is closed), and in particular $x$ would not be in $\hyp[X]$.
+
+Conversely, let $X \subseteq \mathbb{R}^n$ be compact.
+Then $X$ is bounded: if $X$ were unbounded, then $\hyp[X]$ would contain an infinite $x \in \hyp[\mathbb{R}^n]$ (since if not, we could distinguish infinite hyperreals from finite ones by comparing them with members of $\hyp[X]$), and so no member of $X \subseteq \mathbb{R}^n$ could be infinitesimally close to $x$.
+
+$X$ is closed: let $y \in \mathbb{R}^n \setminus X$.
+We wish to show that the monad of $y$ is entirely outside $\hyp[X]$.
+If the monad of $y$ contained an element $x$ of $\hyp[X]$, then by compactness, there would be a member of $\mathbb{R}^n$ which lay in $X$, infinitesimally close to $x$.
+The only possible such standard member of $\mathbb{R}^n$ is $y$, so in fact $y$ must lie in $X$ after all.
+\end{proof}
+
+\section{Measure theory}
+These final sections will address some meatier ideas, with the two goals of formulating Lebesgue measure and Brownian motion in the language of infinitesimals.
+For Lebesgue measure, we primarily use Goldblatt \cite{goldblatt}, Chapter 16.
+For the applications to Brownian motion, we use Hurd and Loeb \cite{hurdloeb}, section IV.6.
+
+Recall the following definitions of several objects fundamental to the study of (standard) measure theory:
+
+\
+
+\begin{defn}[$\sigma$-algebra] A collection $\mathcal{A}$ of subsets of set $S$ is a \emph{$\sigma$-algebra} if it contains the empty set and is closed under countable unions, complements, and symmetric differences.
+
+If $\mathcal{A}$ is only closed under finite unions (and complements and symmetric differences), it is called a \emph{ring of sets}.
+\end{defn}
+
+\pagebreak
+
+\begin{defn}[Measure]
+Let $\mathcal{A}$ be a $\sigma$-algebra.
+A function $\mu: \mathcal{A} \to \mathbb{R}^{\geq 0} \cup \{ \infty \}$ is a \emph{measure} if $\mu(\emptyset) = 0$ and it is countably additive: whenever $(A_n)_{n=1}^{\infty}$ is a sequence of pairwise-disjoint members of $\mathcal{A}$, we have $$\mu \left(\bigcup_n A_n \right) = \sum_n \mu(A_n)$$
+
+If $\mathcal{A}$ is instead merely a ring of sets, $\mu$ is a \emph{measure} if instead it is countably additive over all sequences of pairwise-disjoint members of $\mathcal{A}$ \emph{whose union is in $\mathcal{A}$}.
+\end{defn}
+
+\
+
+It is a classical fact that any measure on a ring of sets $\mathcal{A}$ may be extended to a measure on a $\sigma$-algebra $\sigma(\mathcal{A})$, the intersection of all $\sigma$-algebras containing $\mathcal{A}$; this result is known as the Carath\'eodory extension theorem.
+The theorem takes a measure $\mu$ on $\mathcal{A}$ and outputs a measure called the \emph{outer measure} $\mu^+$ on $\sigma(\mathcal{A})$.
+The exact construction of the outer measure does not concern us, but it coincides with $\mu$ on members of $\mathcal{A}$.
+The outer measure need not be even a finitely additive set function on the power set $\powerset(S)$, though it is countably additive on $\sigma(\mathcal{A}) \subseteq \powerset(S)$; those subsets of $S$ on which $\mu^+$ is guaranteed to behave additively are known as the \emph{measurable sets}, which we now define.
+
+\
+
+\begin{defn}[Measurable set; see Halmos \cite{halmos}, \textsection 11] \label{defn:measurable}
+Given a measure $\mu$ on ring of sets $\mathcal{A} \subseteq \powerset(S)$, we say that a set $B \subseteq S$ is \emph{$\mu^+$-measurable} if, for every $E \in \mathcal{A}$, we have $$\mu^+(E) = \mu^+(E \cap B) + \mu^+(E \setminus B)$$ 
+where $\mu^+$ is the outer measure on $\sigma(\mathcal{A})$.
+That is, $B$ ``splits every $E \in \mathcal{A}$ in a way that is additive with respect to $\mu^+$''. 
+
+It is a fact that every member of $\mathcal{A}$ is $\mu^+$-measurable.
+\end{defn}
+
+\
+
+Recall the definition of the Lebesgue measure on $\mathbb{R}$:
+
+\
+
+\begin{defn}[Lebesgue measure]
+The \emph{Lebesgue measure} on $\mathbb{R}$ is the measure $\lambda$, on the $\sigma$-algebra generated by the open sets of the Euclidean topology (that is, the $\sigma$-algebra whose members are the \emph{Borel sets}), such that $$\lambda([a,b]) = b-a$$
+for all reals $a \leq b$.\end{defn}
+\begin{remark}
+This does indeed specify a measure, by the Carath\'eodory extension theorem.
+It is in fact the \emph{unique} measure such that $\lambda([a,b]) = b-a$; this is Theorem A of \textsection 13 in \cite{halmos}.
+\end{remark}
+
+\
+
+We will consider measures constructed by applying Carath\'eodory's extension theorem to measures $\mu_L$ of the following form, as in Goldblatt \cite{goldblatt}, Section 16.5.
+Let $\mathcal{A}$ be an internal ring of subsets of $S \subseteq \hyp$.
+Let $$\mu: \mathcal{A} \to \hyp^{\geq 0} \cup \{ \infty \}$$ be any finitely-additive function.
+Define $\mu_L$ (for ``$\mu$-Loeb'') by $\mu_L(A) = \st(\mu(A))$ if $\mu(A)$ is finite, and $\infty$ if $\mu(A)$ is infinite (as a hyperreal) or is the literal value $\infty$.
+
+Then $\mu_L$ extends to a measure $\mu_L^+$ on $\sigma(\mathcal{A})$. We say a set $B \subseteq \hyp$ is \emph{Loeb measurable} if it is measurable with respect to $\mu_L^+$, in the sense of Definition \ref{defn:measurable}.
+
+The Loeb measure construction essentially lets us specify a hyperreal size for each member of an internal collection of subsets of $\hyp$, and pull that back into a true real-valued ordinary measure on that internal collection.
+
+\
+
+\begin{example}
+Take $S = \hyp^{\geq 0}$.
+Let $\mathcal{A}$ be the set of singletons from $\hyp^{\geq 0}$.
+
+Then $\sigma(\mathcal{A})$ is the collection of countable sets and cocountable sets (that is, those whose complements are countable), since this collection is closed under taking countable unions, complements, and symmetric differences.
+
+Define $\mu: \{ \hyp[a] \} \mapsto 1$, the counting measure.
+Then $\mu_L^+$ is the measure which takes a set $A \subseteq \hyp$, and returns the following:
+\begin{itemize}
+\item If $A$ has cardinality $n$, where $n$ is finite, then $\mu_L^+$ returns $n$;
+\item Otherwise $\mu_L^+$ returns $\infty$ (that is, in the case that $A$ is infinite or hyperfinite).
+\end{itemize}
+So, for example, $\mu_L^+(\{ 0, 1, \dots, N \}) = \infty$, where $N$ is an infinite hypernatural.
+Notice that $\mu_L^+$ need not be internal: the above $\mu_L^+$ is capable of distinguishing between finite and infinite hypernaturals.
+\end{example}
+
+\subsection{Comprehensiveness} \label{sec:comprehensiveness}
+We shall work in a \emph{sequentially comprehensive} system, as defined in Section 15.4 of Goldblatt \cite{goldblatt}.
+That is, one in which any function $f: \mathbb{N} \to B$ from $\mathbb{N}$ to an internal set $B \subseteq \hyp$ extends to a function $\hyp[f]: \hyp[\mathbb{N}] \to B$.
+Alternatively stated, any sequence $(s_n)_{n=1}^{\infty}$ of elements of internal set $B \subseteq \hyp$ will extend to an internal hypersequence $(\hyp[s_n])_{n \in \hyp[\mathbb{N}]}$.
+(We implicitly used this property earlier when dealing with hypersequences; it comes free of charge through the transfer principle when $f$ admits a first-order description, for instance.)
+
+The ultrapower construction always creates a sequentially comprehensive system, for what Goldblatt calls ``intricate'' reasons which we will not cover here.
+
+The upshot will be as follows.
+Given an internal sequence of sets $(A_n)_{n \in \mathbb{N}}$, and a list of properties $(P_n)$ such that $A_m$ satisfies property $P_n$ for all $m \geq n$, we can extend the sequence $(A_n)$ to a hypersequence.
+For $N$ an infinite hypernatural, $A_N$ will then have property $P_i$ for all finite naturals $i$.
+That is, we will have constructed an object which has all these properties simultaneously.
+
+This construction is akin in spirit to taking an intersection of nested sets with some property, to obtain an object which has all the properties.
+
+\subsection{Alternative characterisation of Loeb measurability} \label{sec:alternativeloeb}
+
+Recall the classical fact that a subset of $[0,1]$ is Lebesgue measurable if and only if it can be approximated arbitrarily well by finite unions of intervals, and its complement can also be approximated arbitrarily well by finite unions of intervals.
+(See the proof of Theorem 4.3a in \cite{williamson}, for instance.)
+
+With this in mind, we prove the following characterisation, from Section 16.6 of Goldblatt \cite{goldblatt}.
+The goal here is to show that Lebesgue measure is a (rather natural) example of a Loeb measure.
+
+\
+
+\begin{defn}[$\mu$-approximability] \label{defn:muapprox}
+Let $\mathcal{A}$ be an internal ring of subsets of $S \subseteq \hyp$, and $\mu: \mathcal{A} \to \hyp^{\geq 0} \cup \{ \infty \}$ a finitely-additive function.
+
+We say that $B \subseteq S$ is \emph{$\mu$-approximable} if, for every $\varepsilon \in \mathbb{R}^{>0}$, there are sets $C_{\varepsilon}, D_{\varepsilon} \in \mathcal{A}$ with $\mu_L(D_{\varepsilon} \setminus C_{\varepsilon}) < \varepsilon$ and $C_{\varepsilon} \subseteq B \subseteq D_{\varepsilon}$.
+\end{defn}
+
+\
+
+\begin{lemma} \label{lemma:approx} We can approximate any $\mu$-approximable set $B \subseteq \hyp$ by a member of $\mathcal{A}$, in the following sense: there is some $A \in \mathcal{A}$ such that the symmetric difference $A \symdiff B$ has $\mu_L^+$-measure zero.
+\end{lemma}
+\begin{proof}
+Take a sequence of nested $\frac{1}{n}$-approximations $C_{n} \subseteq B \subseteq D_n$, and extend each $\langle C_n : n \in \mathbb{N} \rangle$, $\langle D_n: n \in \mathbb{N} \rangle$ to a hypersequence of $\frac{1}{N}$-approximations for $N$ ranging over the hypernaturals.
+(This is justified by the remark on sequential comprehensiveness.)
+
+Let the hypersequences be $\langle C_n : n \in \hyp[\mathbb{N}] \rangle$ and $\langle D_n : n \in \hyp[\mathbb{N}] \rangle$ where $C_n \subseteq B \subseteq D_n$ for all $n \in \hyp[\mathbb{N}]$.
+Then if we fix any (necessarily finite) $k \in \mathbb{N}$, it is an internal true statement that for every $n \in \hyp[\mathbb{N}]$, if $n \leq k$ then $C_n \subseteq D_k \subseteq D_n$ (by nestedness).
+
+Since all finite naturals $k$ satisfy that property, it must be the case that some infinite hypernatural $K$ does too (because otherwise this would be a property that distinguished between finite and infinite naturals, contradicting Theorem \ref{thm:infinite_not_internal}): there is $K$ such that for all $n \in \hyp[\mathbb{N}]$, $$n \leq K \Rightarrow C_n \subseteq D_K \subseteq D_n$$
+
+Then $D_K$ is our desired member of $\mathcal{A}$ such that $\mu_L^+(D_K \symdiff B) = 0$.
+
+Indeed, $$D_K \symdiff B = (D_K \setminus B) \cup (B \setminus D_K) \subseteq D_n \setminus C_n$$ for all $n \in \mathbb{N}$.
+The right-hand side has $\mu_L^+$-measure less than $\frac{1}{n}$; 
+so we obtain that $\mu_L^+(D_K \symdiff B)$ is a standard real which is less than all $\frac{1}{n}$.
+
+That is, $\mu_L^+(D_K \symdiff B) = 0$.
+\end{proof}
+
+In fact, there is a very concrete definition of the Loeb measure $\mu_L^+$ of a set $B \subseteq S \subseteq \hyp$ which does not appear in the ring of sets $\mathcal{A} \subseteq \powerset(S)$.
+This concreteness comes at the cost of working with arbitrary $\varepsilon > 0$, but it will turn out to be the key ingredient allowing us to move freely between Loeb measure and Lebesgue measure.
+Morally speaking, Lebesgue measure is a statement about ``those sets we may approximate by nice sets'', and approximation is easiest with an $\varepsilon$-related treatment; this is the motivation for the following lemma about Loeb measure.
+
+\
+
+\begin{lemma} \label{lemma:loebsup} Suppose $B \subset \hyp$ is Loeb measurable with finite Loeb measure.
+Then $$\mu_L^+(B) = \inf \{ \mu_L(A) : A \in \mathcal{A}, B \subseteq A \} = \sup \{ \mu_L(A) : A \in \mathcal{A}, A \subseteq B \} $$
+\end{lemma}
+\begin{proof}
+We will assume the first equality; its proof requires manipulating the specific construction of the measure $\mu_L^+$ according to the Carath\'eodory extension theorem.
+This is not particularly difficult, but it requires some ``grubby details''.
+The proof may be found\footnote{Be warned that Goldblatt abuses the notation $\mu_L(B)$ to mean $\mu_L^+(B)$ when $B$ is Loeb measurable.} as Lemma 16.5.1 of Goldblatt \cite{goldblatt}.
+
+To prove the second equality, then, we will show that $$\mu_L^+(B) = \sup \{ \mu_L(A) : A \in \mathcal{A}, A \subseteq B \}$$
+
+Let $\varepsilon \in \mathbb{R}^{>0}$.
+We need to find $A_{\varepsilon} \in \mathcal{A}$ with $A_{\varepsilon} \subseteq B$ and $$\mu_L^+(B) < \mu_L(A_{\varepsilon}) + \varepsilon$$
+
+Now, we stipulated that $B$ had finite Loeb measure, so (by the first part of the lemma) $$\mu_L^+(B) = \inf \{ \mu_L(A) : A \in \mathcal{A}, B \subseteq A \} < \infty$$
+That is, there is some $A \in \mathcal{A}$ with $B \subseteq A$ and $\mu_L(A) < \infty$.
+
+We can therefore use the first part of the lemma again, applied to $A \setminus B$.
+(Drawing Venn diagrams will elucidate this section.)
+
+Since $\mu_L(A)$ is finite, we have $$\mu_L^+(A \setminus B) = \mu_L(A) - \mu_L^+(B)$$
+which is again finite, so by the first part of the lemma, we can approximate it: let $C \in \mathcal{A}$ be such that $A \setminus B \subseteq C$ and $$\mu_L(C) < \mu_L^+(A \setminus B) + \varepsilon$$
+
+Now, $A \setminus C$ is a set-difference of members of $\mathcal{A}$, so it lies in $\mathcal{A}$; it is also a subset of $B$, since $A \setminus B \subseteq C$ so $A \setminus C \subseteq A \setminus (A \setminus B) \subseteq B$.
+
+Then $$C \supseteq (A \setminus B) \disjointunion (B \setminus [A \setminus C])$$ (where $\disjointunion$ is a disjoint union), and each of those terms is Loeb measurable, so $$\mu_L(C) \geq \mu_L^+(A \setminus B) + \mu_L^+(B \setminus [A \setminus C])$$
+
+We chose $C$ such that $\mu_L(C) < \mu_L^+(A \setminus B) + \varepsilon$.
+Therefore $$\mu_L^+(B \setminus [A \setminus C]) < \varepsilon$$
+so $$\mu_L^+(B) < \mu_L^+(A \setminus C) + \varepsilon$$
+
+Finally, we have already noted that $A \setminus C$ lies in $\mathcal{A}$, so the proof is complete: set $A_{\varepsilon} = A \setminus C$.
+\end{proof}
+
+\begin{thm}[Alternative definition of Loeb measurability] \label{thm:alternativeloeb} Let $B \subseteq \hyp$.
+\
+\begin{enumerate}
+\item \label{thm:muapprox} Suppose $B$ is $\mu$-approximable. Then $B$ is Loeb measurable.
+\item \label{thm:meas} Suppose $B$ is Loeb measurable with $\mu_L(B) \not = \infty$. Then $B$ is $\mu$-approximable.
+\end{enumerate}
+\end{thm}
+
+\begin{proof}
+(\ref{thm:muapprox}): We sketch this direction.
+Suppose $B$ is $\mu$-approximable.
+Recall that $\mu_L^+$ is the measure obtained by extending $\mu_L$ to a measure on $\sigma(\mathcal{A})$.
+
+Then we can find a set $A \in \mathcal{A}$ such that $\mu_L^+ (A \symdiff B) = 0$ (for $\symdiff$ the symmetric difference), as guaranteed by Lemma \ref{lemma:approx}.
+
+We now need to show that $B$ itself is Loeb measurable: that is, it is measurable in the sense of Definition \ref{defn:measurable} with respect to $\mu_L^+$.
+
+That is, for any $E \in \mathcal{A}$, we need $B$ to split $E$ additively with respect to $\mu_L^+$: we need $$\mu_L^+(E) = \mu_L^+(E \cap B) + \mu_L^+(E \setminus B)$$
+
+Recall from Definition \ref{defn:measurable} that every member of $\mathcal{A}$ is automatically $\mu_L^+$-measurable; so the equality holds if we replace $B$ with $A$ throughout.
+But we have defined $A$ to be ``almost equal'' to $B$ in the sense of Lemma \ref{lemma:approx}, and so by a simple argument (elucidated by a Venn diagram), the equality holds with $B$ as well.
+(For full details, see Lemma 16.6.3 of \cite{goldblatt}; what remains of the argument is mere unenlightening algebra.
+The essence is that ``$A$ is extremely close to $B$ from the point of view of $\mu_L^+$''.)
+
+(\ref{thm:meas}):
+Let $\varepsilon \in \mathbb{R}^{>0}$.
+We need to show that we can find approximating sets $C_{\varepsilon}, D_{\varepsilon} \in \mathcal{A}$ with $$\text{$\mu_L(D_{\varepsilon} \setminus C_{\varepsilon}) < \varepsilon$ and $C_{\varepsilon} \subseteq B \subseteq D_{\varepsilon}$}$$ 
+
+But this is the content of Lemma \ref{lemma:loebsup}: $$\mu_L^+(B) = \inf \{ \mu_L(A) : A \in \mathcal{A}, B \subseteq A \} = \sup \{ \mu_L(A) : A \in \mathcal{A}, A \subseteq B \}$$
+
+so we can find $C_{\varepsilon} \in \mathcal{A}$ with $C_{\varepsilon} \subseteq B$ such that $$\mu_L(C_{\varepsilon}) \geq \mu_L^+(B) - \frac{\varepsilon}{2}$$ and we can similarly find $D_{\varepsilon} \supseteq B$ such that $$\mu_L(D_{\varepsilon}) \leq \mu_L^+(B) + \frac{\varepsilon}{2}$$
+from which the result follows immediately.
+\end{proof}
+
+\subsection{Lebesgue measure via Loeb measure}
+It turns out that Lebesgue measure can be defined in a very natural way as a Loeb measure, by ``assigning a weight to an infinitesimal-width lattice on $\mathbb{R}$'', as in Section 16.8 of Goldblatt \cite{goldblatt}.
+
+\
+
+\begin{defn}[Loeb measure defining the Lebesgue measure] \label{defn:loeblebesgue}
+Fix an infinite hypernatural $N$, and define a lattice $$S = \left \{ \frac{k}{N} : k \in \hyp[\mathbb{Z}], -N^2 \leq k \leq N^2 \right\}$$
+
+Define $\powerset_I(S)$ to be the collection of internal subsets of $S$, so each of its members is hyperfinite (indeed, of hyperfinite size less than or equal to $2 N^2 + 1$).
+It is an internal algebra, and $\mu: \powerset_I(S) \to \hyp^{\geq 0}$ given by $$\mu(A) = \frac{|A|}{N}$$ defines a finitely additive function suitable for creating a Loeb measure.
+
+Specifically, $$\mu_L(A) = \st \left( \frac{|A|}{N} \right)$$ if $\frac{|A|}{N}$ is finite; and $\mu_L(A)$ takes the literal value $\infty$ otherwise.
+$\mu_L^+$ is the measure on $\sigma(\powerset_I(S))$ whose existence is guaranteed by the Carath\'eodory extension theorem.
+
+\end{defn}
+
+\
+
+\begin{remark}
+Notice that $\mu_L^+$ is a measure on $\sigma(\powerset_I(S))$, not on $\powerset_I(S)$.
+Since $\sigma(\powerset_I(S))$ may contain some non-internal subsets of $S$, this means that while $\mu_L$ is restricted only to internal sets, $\mu_L^+$ may be able to measure some external sets as well.
+An example is the finite hyperreals, which are given by $$\bigcup_{n \in \mathbb{N}} \hyp[(] \unaryminus n, n) \cap S$$
+This is a countable union of measurable sets, so it is measurable; but it cannot be specified internally.
+The union is taken over a non-internal set.
+\end{remark}
+
+\
+
+Now we wish to show that, in some sense, the above Loeb measure coincides with the Lebesgue measure $\lambda$ on $\mathbb{R}$.
+
+Since $\mu_L$ is a function on subsets of the lattice $S \subset \hyp$, one might imagine that the following procedure is required to find the ``Loeb measure'' of a set $B \subseteq \mathbb{R}$ (recalling that, strictly speaking, only subsets of $\hyp$ can have Loeb measure):
+\begin{enumerate}
+\item Transfer $B$ to the hyperreals;
+\item Intersect $\hyp[B]$ with $S$;
+\item Take the Loeb measure of the resulting set.
+\end{enumerate}
+
+However, this procedure fails to give the desired answer for the set $\mathbb{Q}$, which we know to have Lebesgue measure $0$.
+Indeed, $\hyp[\mathbb{Q}]$ contains $S$, so it must have infinite Loeb measure under this (faulty) scheme, rather than the $0$ we would like if our measure resembles Lebesgue measure.
+Additionally, if $B$ is not an internal subset of $\mathbb{R}$, then we cannot necessarily transfer it to $\hyp$ in the first place.
+
+In keeping with the idea of ``approximate with an infinitesimal mesh'' (as opposed to ``project onto an infinitesimal mesh''), we instead aim to show that $$\lambda(B) = \mu_L^+(\app{B})$$
+where $\app{B}$, the ``approximation of $B$'', is defined\footnote{Goldblatt uses notation equivalent to $\st^{-1}(\cdot)$ for $\app{\cdot}$ in Section 16.8 of \cite{goldblatt}.} to be $$\app{B} = \{ s \in S: \text{$s$ is finite and $\st(s) \in B$} \}$$ 
+
+\
+
+\begin{defn}Given $B \subseteq \mathbb{R}$, we will say $B$ is \emph{``Loeb measurable''} (with quotation marks) if $\app{B}$ is Loeb measurable, with respect to $\mu_L^+$.
+We will say $B$ has ``Loeb measure'' $m$ (with quotation marks) if $\app{B}$ has Loeb measure $m$.
+
+This notation is not standard.
+\end{defn}
+
+\begin{remark}Notice that $\app{B}$ is not necessarily an internal set, because it relies on the predicate ``$s$ is finite''.
+In fact, $\app{B}$ might not even be Loeb measurable.
+This happens, for instance, whenever $B$ is not Lebesgue measurable.
+We will prove this as Theorem \ref{thm:loebimplieslebesgue}.
+\end{remark}
+
+\begin{example}
+In the case $B = \mathbb{R}$, we have $$\app{B} = \{ s \in S: \text{$s$ is finite} \}$$
+which is definitely not an internal set.
+Nonetheless, $\app{B}$ is still Loeb measurable, because it is a countable (albeit non-internal) union (in $\hyp$) of Loeb measurable sets:
+$$\bigcup_{n \in \mathbb{N}} (S \cap \hyp[(-n, n]))$$
+Each of the terms in the union is an internal subset of the lattice $S$, and so is Loeb measurable.
+\end{example}
+
+\begin{example}[The Cantor set]
+Throughout this example, we will use the notation $0.a_1 a_2 \dots$ to denote ternary expansion.
+Recall that the Cantor set is defined as $$\mathcal{C} = \{x \in [0,1] : \text{$x$ contains no $1$ in its ternary expansion} \}$$
+It is well-known to have Lebesgue measure $0$ despite being uncountable.
+
+What is $\app{\mathcal{C}}$?
+
+It is an internal fact of $\mathbb{R}$ that every real in $[0,1]$ has a ternary expansion.
+Therefore it is true also in $\hyp$: every hyperreal in $\hyp[[]0,1]$ has an expansion of the form 
+$$0.(a_1 a_2 \dots a_n a_{n+1} \dots)(\dots a_{M-1} a_M a_{M+1} \dots)\dots $$
+where $M$ is an example of an infinite hypernatural number, and (to ensure uniqueness of the expansion) we choose the $a_i$ so that it is never the case that from some point on, all the $a_j$ are equal to $2$.
+
+The standard part of this number $x$ is precisely $$0.a_1 a_2 \dots$$
+the ``standard part'' of its base-$3$ expansion, where we truncate any infinite-index places.
+
+So, a hyperreal $s \in S$ lies in $\app{\mathcal{C}}$ if and only if the ``standard part'' of its base-$3$ expansion consists only of the base-$3$ digits $0$ and $2$.
+
+But how many of these are there?
+Recalling that $N$ is the hypernatural denominator of every element of our lattice $S \subseteq \hyp$, we can pick $N = 3^P$ (where $P$ is hypernatural) in such a way that all the elements $\frac{k}{N} \in S$ have hyper-terminating base-$3$ expansion:
+$$0.(a_1 a_2 \dots)( \dots a_{P-1} a_P)$$
+
+Then $$\app{\mathcal{C}} = \{ (0.a_1 a_2 \dots) (\dots a_{P-1} a_P) : \text{$a_i \not = 1$ for each $i \in \mathbb{N}$} \}$$
+This set is not \emph{a priori} internal, because we built it using the ``$i \in \mathbb{N}$'' clause.
+But it is the following (external) nested intersection of Loeb measurable sets:
+$$\app{\mathcal{C}} = \bigcap_{n \in \mathbb{N}} \{ (0.a_1 a_2 \dots) (\dots a_{P-1} a_P) : \text{$a_i \not = 1$ for each $i < n$}\}$$
+
+Being a countable intersection of Loeb measurable sets, it is measurable according to the extension $\mu_L^+$, and its measure is the limit of the measures of the components.
+
+The component $\{ (0.a_1 a_2 \dots) (\dots a_{P-1} a_P) : \text{$a_i \not = 1$ for each $i < n$}\}$ has hyperfinite size $$2^n 3^{P-n} = \left(\frac{2}{3} \right)^n 3^P$$
+where we note that since every such ternary expansion is hyper-terminating, it is auto\-matically ``acceptable'' in that it is not of the form $0.a_1 a_2 \dots a_{K-1} a_{K} 2222\dots$ for any (finite or infinite) hypernatural $K$.
+
+So the ``Loeb measure'' of $\mathcal{C}$ is $$\mu_L^+(\app{\mathcal{C}}) = \st \left( \frac{|\app{\mathcal{C}}|}{3^P} \right) = \st \left( \lim_{n \to \infty} \left[\frac{2}{3} \right]^n \right) = 0$$
+\end{example}
+
+\
+
+\begin{thm} \label{thm:lebesgueimpliesloeb} Lebesgue measurable sets are ``Loeb measurable''. That is,
+\begin{enumerate}
+\item The ``Loeb measure'' of $(a, b) \subset \mathbb{R}$ exists, and is $b-a$.
+\item More generally, if $B \subseteq \mathbb{R}$ is Lebesgue measurable, then it is ``Loeb measurable'', and its ``Loeb measure'' is equal to its Lebesgue measure.
+\end{enumerate}
+\end{thm}
+\begin{proof}
+(1): $$\app{(a, b)} = \{ s \in S : a < \st(s) < b \} = \bigcup_{n \in \mathbb{N}^{\geq 1}} \left[S \cap \hyp[(]a+\frac{1}{n}, b-\frac{1}{n}) \right]$$
+This is a nested countable union of internal sets, so its Loeb measure exists and is equal to the limit of the Loeb measures of the individual $S \cap \hyp[(]a+\frac{1}{n}, b-\frac{1}{n})$.
+
+But $S \cap \hyp[(]a+\frac{1}{n}, b-\frac{1}{n})$ is hyperfinite, because it is an internally specified subset of a hyperfinite set; so it has greatest and least elements $g$ and $l$ respectively, and it is easy to see that $g \near b-\frac{1}{n}$ and $l \near a+\frac{1}{n}$.
+
+Therefore $$S \cap \hyp[(]a+\frac{1}{n}, b-\frac{1}{n}) = \left\{ \frac{K}{N}, \frac{K+1}{N}, \dots, \frac{L}{N} \right\}$$ for some $K, L$ hypernaturals, where $\frac{K}{N} = l$ and $\frac{L}{N} = g$.
+The internal cardinality of this set is the hypernatural $L-K+1$, so the Loeb measure is $$\st \left( \frac{|S \cap \hyp[(]a+\frac{1}{n}, b-\frac{1}{n})|}{N} \right) = \st \left( \frac{L-K+1}{N} \right) = \st \left( g-l + \frac{1}{N} \right) = b-a-\frac{2}{n}$$
+
+By taking the limit as $n \to \infty$, we obtain $\app{(a,b)} = b-a$.
+
+(2): This section of the proof will involve working with epsilons, as is characteristic of showing that standard definitions are equivalent to non-standard ones.
+
+Note that $\app{\emptyset} = \emptyset$, so the ``Loeb measure'' of $\emptyset$ coincides with the Lebesgue measure.
+
+The first part of this theorem states that the ``Loeb measure'' agrees with Lebesgue measure on a basis of the Borel $\sigma$-algebra on $\mathbb{R}$.
+There is a uniqueness theorem for measures, which forces the ``Loeb measure'' and the Lebesgue measure to agree on every Borel set (since they already agree on a basis of the $\sigma$-algebra).
+This is the content of Lemma 16.4.1 of \cite{goldblatt}.
+
+Now, every Lebesgue measurable set $B$ can be approximated by Borel sets in an arbitrarily fine way: for every $\varepsilon$ there are Borel sets $C_{\varepsilon}$ and $D_{\varepsilon}$ such that $$C_{\varepsilon} \subseteq B \subseteq D_{\varepsilon}$$
+with $\lambda(B \setminus C_{\varepsilon}) < \varepsilon$, and similarly $\lambda(D_{\varepsilon} \setminus B) < \varepsilon$.
+(Recall this fact from the preamble to Section \ref{sec:alternativeloeb} of this essay, as the alternative characterisation of Lebesgue measurability.)
+
+Since $C_{\varepsilon}$ and $D_{\varepsilon}$ are Borel, they are ``Loeb measurable''.
+Certainly $$\app{C_{\varepsilon}} \subseteq \app{B} \subseteq \app{D_{\varepsilon}}$$
+but $C_{\varepsilon}$ has $\lambda(C_{\varepsilon}) = \mu_L^+(C_{\varepsilon})$ by the fact that $\lambda$ and $\mu_L^+$ agree on Borel sets; similarly $\lambda(D_{\varepsilon}) = \mu_L^+(D_{\varepsilon})$.
+
+Therefore $\app{B}$ is $\mu$-approxim\-able (recall Definition \ref{defn:muapprox})---strictly speaking, by taking a $\mu$-approximation of $C_{\varepsilon}$ to be the smaller set and a $\mu$-approximation of $D_{\varepsilon}$ to be the larger set, as per Lemma \ref{lemma:approx}---so by Theorem \ref{thm:alternativeloeb}, $B$ is ``Loeb measurable''.
+
+Its ``Loeb measure'' is sandwiched between $\lambda(C_{\varepsilon})$ and $\lambda(D_{\varepsilon})$ for all $\varepsilon \in \mathbb{R}^{>0}$, and the sets $C_{\varepsilon}$ and $D_{\varepsilon}$ are at most $2 \varepsilon$ apart in Lebesgue measure.
+Therefore the ``Loeb measure'' of $B$ is equal to the limit of the $\lambda(C_{\varepsilon})$ (and also equal to the limit of the $\lambda(D_{\varepsilon})$), which is $\lambda(B)$.
+\end{proof}
+
+% Apologies for the awful choice of hyphenation in $\mu$-approximability; it seems to be the least bad option.
+We now prove the other direction of the equivalence, using Theorem \ref{thm:alternativeloeb} on $\mu$-approxima\-bility so that we may ensure we are always dealing concretely with ``nice'' sets.
+Again the alternative characterisation of Lebesgue measurability (from the preamble to Section \ref{sec:alternativeloeb}) will come into play: Lebesgue measurable sets are those which may be approximated arbitrarily well by Borel sets.
+
+First, we require a technical lemma, which is Theorem 11.13.1 of Goldblatt \cite{goldblatt}.
+It is technical in the sense that it is potentially sensitive to the explicit construction of the hyperreals; it is a fact of the ultrapower construction.
+If we wished to remain agnostic about the construction of the hyperreals, it would be necessary to insist that we were working in a \emph{countably saturated} system---a requirement which is satisfied by the ultrapower construction---which is to say that the intersection of any decreasing sequence of nonempty internal sets is nonempty.
+Goldblatt (in Theorem 11.10.1 of \cite{goldblatt}) calls this a ``delicate'' fact about the ultrapower; we will not prove it here.
+
+\
+
+\begin{lemma} \label{lemma:internalclosed} Let $X$ be an internal subset of $\hyp$. Then $\{ \st(x): x \in X \}$ is closed as a subset of $\mathbb{R}$.
+\end{lemma}
+\begin{proof}
+Let $r \in \mathbb{R}$ be a limit point of $\{ \st(x) : x \in X\}$; say $r$ is the limit of the sequence $$(\st(x_i))_{i \in \mathbb{N}}$$
+We need $r = \st(y)$ for some $y \in X$.
+
+By omitting some terms of the sequence if necessary, we may pick each $x_i$ so that $$\hyp[|]r-x_i| < \frac{1}{i}$$
+That is, $$x_i \in X \cap \hyp[(]r-\frac{1}{i}, r+\frac{1}{i})$$
+
+Given countable saturation, there is some $y \in X$ lying in all the $X \cap \hyp[(]r-\frac{1}{n}, r+\frac{1}{n})$; then $\st(y) = r$ as required, since for all $n \in \mathbb{N}$, we have $$|r-y| < \frac{1}{n}$$
+\end{proof}
+
+\
+
+\begin{thm} \label{thm:loebimplieslebesgue}
+Let $B \subseteq \mathbb{R}$ be ``Loeb measurable'' (that is, $\app{B}$ is Loeb measurable).
+Then $B$ is Lebesgue measurable, and $\lambda(B)$ is equal to $\mu_L^+(\app{B})$.
+\end{thm}
+\begin{proof}
+Let $B$ be ``Loeb measurable''.
+It is enough to show that $B$ is Lebesgue measurable; then Theorem \ref{thm:lebesgueimpliesloeb} tells us that its ``Loeb measure'' is equal to its Lebesgue measure.
+
+There are two cases: $B$'s ``Loeb measure'' is either finite or the literal value $\infty$.
+
+If it is finite, then by Theorem \ref{thm:alternativeloeb}, $\app{B}$ is $\mu$-approximable.
+(Recall Definitions \ref{defn:muapprox} and \ref{defn:loeblebesgue}: $\mathcal{A} = \powerset_I(S)$ is the collection of internal subsets of the lattice $S$, and $B$ has the property that for every $\varepsilon \in \mathbb{R}^{>0}$, there are sets $C, D \in \powerset_I(S)$ such that $\mu_L(D \setminus C) < \varepsilon$ and $C \subseteq \app{B} \subseteq D$.)
+
+Let $\varepsilon \in \mathbb{R}^{> 0}$, and pick $\hyp[C], \hyp[D] \in \mathcal{A}$ approximating $\app{B}$ to within $\varepsilon$.
+(We label them $\hyp[C]$ and $\hyp[D]$ as a cue to the fact that these are internal subsets of the hyperreal lattice.)
+
+Now, we would like to use $\hyp[C]$ to build a set of reals which approximates $B$ from below in the Lebesgue sense.
+There are two possible sets to take: the set of all standard parts of elements of $\hyp[C]$, or $C$ itself.
+(These are in general not necessarily the same set: consider $\hyp[(]0, 1)$, which contains an infinitesimal $\varepsilon > 0$ whose standard part is $0$, even though $0$ does not lie in $(0, 1)$.)
+It turns out that the correct set is the set $$C_{\varepsilon} := \{ \st(c): c \in \hyp[C] \}$$
+
+By Lemma \ref{lemma:internalclosed}, $C_{\varepsilon}$ is closed; that makes it Borel, as is required for the alternative definition of Lebesgue measurability.
+
+Similarly the set $D_{\varepsilon}$ is open and hence Borel, where $$D_{\varepsilon} := \mathbb{R} \setminus \{ \st(d): d \in S \setminus \hyp[D] \}$$
+(This definition is a little cunning; it is designed to maximise the symmetry between $C_{\varepsilon}$ and $D_{\varepsilon}$.
+It reflects the idea of ``cover the set and its complement'' from the preamble before Definition \ref{defn:muapprox} of $\mu$-approximability.)
+
+We have $$C_{\varepsilon} \subseteq \{ \st(b) : b \in \app{B} \} = B \subseteq D_{\varepsilon}$$
+by taking standard parts of the true-by-definition $$\hyp[C] \subseteq \app{B} \subseteq \hyp[D]$$
+
+We just need $\lambda(D_{\varepsilon}) - \lambda(C_{\varepsilon})$ to be small.
+But we have just proved (in Theorem \ref{thm:lebesgueimpliesloeb}) that Lebesgue measurable sets have ``Loeb measure'' equal to their Lebesgue measure, and we already know $C_{\varepsilon}$ and $D_{\varepsilon}$ are Borel and hence Lebesgue measurable,
+so $$\lambda(D_{\varepsilon}) - \lambda(C_{\varepsilon}) = \mu_L^+(\app{D_{\varepsilon}}) - \mu_L^+(\app{C_{\varepsilon}})$$
+
+Finally, $\mu_L^+(\hyp[C]) \leq \mu_L^+(\app{C_{\varepsilon}})$ because $\hyp[C] \subseteq \app{C_{\varepsilon}}$.
+Indeed, to recap the definitions, $$\text{$\hyp[C] \in \powerset_I(S)$ and $C_{\varepsilon} = \{ \st(c) : c \in \hyp[C] \}$}$$
+so $c \in \hyp[C]$ implies $\st(c) \in C_{\varepsilon}$ which means $c \in \{s \in S: \st(s) \in C_{\varepsilon} \} = \app{C_{\varepsilon}}$.
+
+And likewise $\mu_L^+(\app{D_{\varepsilon}}) \leq \mu_L^+(\hyp[D])$ because $\app{D_{\varepsilon}} \subseteq \hyp[D]$.
+Indeed, if $s \in \app{D_{\varepsilon}}$ then $\st(s) \in D_{\varepsilon}$ so $$\st(s) \in \mathbb{R} \setminus \{ \st(d) : d \in S \setminus \hyp[D]\}$$
+That is, $s \in \hyp[D]$.
+
+Therefore $$\lambda(D_{\varepsilon}) - \lambda(C_{\varepsilon}) \leq \mu_L(\hyp[D]) - \mu_L(\hyp[C]) < 2 \varepsilon$$
+so we have shown that $B$ may be approximated arbitrarily well by Borel sets, so it is Lebesgue measurable.
+This completes the first case.
+
+If instead $B$'s ``Loeb measure'' is the literal $\infty$, then we may express $B \subseteq \mathbb{R}$ as the following union:
+$$\bigcup_{n \in \mathbb{N}} B \cap (-n, n)$$
+We can show that $B$ itself is Lebesgue measurable by showing that each $B \cap (-n, n)$ is Lebesgue measurable.
+
+But note that $$\app{B \cap (-n, n)} = \app{B} \cap \app{(-n, n)}$$
+so that set is Loeb measurable, being the intersection of two Loeb measurable sets.
+It has finite Loeb measure, since $$\mu_L^+(\app{B \cap (-n, n)}) \leq \mu_L^+(\app{(-n, n)}) = 2n$$
+(using Theorem \ref{thm:lebesgueimpliesloeb} to deduce that the ``Loeb measure'' of $(-n, n)$ is equal to its Lebesgue measure).
+
+Therefore we are done by the first case, since $B \cap (-n, n)$ is a ``Loeb measurable'' set with finite ``Loeb measure''.
+\end{proof}
+
+\begin{remark}The following remark is more in a handwaving motivational vein.
+Very loosely, the lattice $S$ can be viewed as a hyperfinite probability space, and the function $\mu$ on it can be viewed as simply a constant (infinite) multiple of a probability measure.
+(A probability measure would have to have denominator $2N^2+1$ rather than $N$, to make the total probability $1$ rather than infinite.)
+Then intuitively every point of a set $B \subset \mathbb{R}$ is assigned \emph{infinitesimal} measure, rather than the absolute zero measure assigned by the standard theory.
+This is a powerful point in favour of the non-standard approach to measure theory: now it is only literally impossible events that are assigned literally zero measure, and all other events are assigned some positive, possibly infinitesimal, measure.
+(Of course, on taking standard parts, producing $\mu_L$ and therefore bringing the results back into the realm of standard probability theory, we recover the possibility that a non-impossible event may have zero measure.)
+\end{remark}
+
+\section{Brownian motion}
+Our primary reference for this section is Hurd and Loeb \cite{hurdloeb}, where we use Chapter IV.6.
+
+Brownian motion is a model of the motion of a small particle (such as a speck of pollen) suspended in a fluid (such as stationary air).
+It is physically observable with a microscope, and it occurs because molecules of the surrounding fluid collide with the particle in a random way, causing random changes of both course and speed.
+
+\
+
+\begin{defn}[Brownian motion] \label{defn:brownian}
+Consider the random position $X_t$ of a particle on the real line at time $t$, where $t$ varies between $0$ and $1$.
+Let $\Omega$ be the state space of the variables $X_t$.
+We say the $[0,1]$-indexed collection of random variables $\langle X_t : 0 \leq t \leq 1 \rangle$ is a \emph{Brownian motion} if:
+\begin{enumerate}
+\item $X_0 = 0$. That is, the particle starts at the origin.
+\item Given any sequence of nonempty intervals $$[s_1, t_1], [s_2, t_2], \dots, [s_n, t_n]$$
+where $s_1 < t_1 \leq s_2 < t_2 < \dots \leq s_n < t_n$,
+we have the random variables $$X_{t_1} - X_{s_1}, \dots, X_{t_n} - X_{s_n}$$ all independent.
+That is, the particle's overall movement during any time period is not affected by its overall movement during any other time period.
+\item \label{item:normal} If $s < t$, then $$\mathbb{P}( \{ \omega \in \Omega: X_t(\omega) - X_s(\omega) \leq \alpha \} ) = \gaussian \left(\frac{\alpha}{\sqrt{t-s}} \right)$$
+for $\gaussian$ the Gaussian integral $$\gaussian(x) = \frac{1}{\sqrt{2 \pi}} \int_{-\infty}^x e^{-u^2/2} du$$
+That is, if the particle's position at time $s$ is known, then its position at time $t$ is normally distributed.
+\end{enumerate}
+\end{defn}
+
+\
+
+A non-standard way to obtain a Brownian motion is derived from considering a random walk.
+
+Let $\Omega^{(n)}$ be the space of all sequences $\omega = (\omega_1, \omega_2, \dots, \omega_n)$, where each $\omega_i = \pm 1$.
+Let a particle move by a distance of $1/\sqrt{n}$ every time-step $t_k = k/n$, in the direction indicated by $\omega_k$.
+
+Then the position of the particle at time $t$ following walk-sequence $\omega$ is given by 
+\begin{equation} \label{eqn:brownian}
+\chi(t, \omega) = \frac{1}{\sqrt{n}} \sum_{i=1}^{\lfloor n t \rfloor} \omega_i
+\end{equation}
+
+The reason for the distance per step being $1/\sqrt{n}$ is so that the resulting walk has the right variance to satisfy the normal distribution requirement that is item (\ref{item:normal}) in Definition \ref{defn:brownian}; this is in anticipation of $\langle \st(\chi(t, \cdot)): t \in [0,1] \rangle$ being a Brownian motion when we let $n$, the length of the sequences $\omega$, be an infinite hypernatural.
+
+\
+
+\begin{thm} \label{thm:brownian1}
+Let $\chi$ be defined as in Equation \ref{eqn:brownian}.
+Let $X_0 = \st(\chi(0, \cdot))$, a random variable on state space $\Omega^{(N)}$, where $N$ is an infinite hypernatural.
+Then $X_0$ is the constant $0$.
+\end{thm}
+\begin{proof}
+This is immediate: the sum defining $X_0$ is the empty sum.
+\end{proof}
+
+\begin{thm} \label{thm:brownian2}
+Let $\chi$ be defined as in Equation \ref{eqn:brownian}.
+Let $X_t := \st(\chi(t, \cdot))$ be $[0,1]$-indexed random variables on states $\Omega^{(N)}$.
+Then for any $s_1 < t_1 \leq s_2 < t_2$, the random variables $$X_{t_1} - X_{s_1}, X_{t_2} - X_{s_2}$$ are independent.
+\end{thm}
+\begin{proof}
+$$X_{t_1}(\omega) - X_{s_1}(\omega) = \st( \chi(t_1, \omega) - \chi(s_1, \omega) ) = \st \left( \frac{1}{\sqrt{N}} \sum_{i=\lfloor N s_1 \rfloor + 1}^{\lfloor N t_1 \rfloor} \omega_i \right)$$
+
+$$X_{t_2}(\omega) - X_{s_2}(\omega) = \st( \chi(t_2, \omega) - \chi(s_2, \omega) ) = \st \left( \frac{1}{\sqrt{N}} \sum_{i=\lfloor N s_2 \rfloor + 1}^{\lfloor N t_2 \rfloor} \omega_i \right)$$
+
+The two random variables are therefore clearly independent: their values are defined by sums ranging over disjoint sections of the input $\omega$.
+\end{proof}
+
+This proof easily generalises to the second property of Definition \ref{defn:brownian} with $n$ rather than two almost-disjoint intervals: in each interval, the sum is being taken over disjoint regions of the input $\omega$.
+
+\
+
+To prove the third property of Definition \ref{defn:brownian}, we will need a non-standard analogue of the Central Limit Theorem.
+
+\
+
+\begin{defn}[$*$-independence of random variables] \label{defn:independence}
+Let $(X_n)_{n \in \hyp[\mathbb{N}]}$ be an internal sequence of random variables.
+We say they are \emph{$*$-independent} if, given any internal $M$-subtuple $(X_{n_i})_{i = 1}^M$, and given any internal $M$-tuple $(\alpha_i)_{i=1}^M$ of reals, we have $$\mathbb{P}\left( \{ \omega \in \Omega: X_1(\omega) < \alpha_1, \dots, X_M(\omega) < \alpha_M \} \right) = \prod_{i=1}^M \mathbb{P}( \{ \omega \in \Omega: X_i(\omega) < \alpha_i \} )$$ 
+That is, ``all hyperfinite subcollections are independent''.
+\end{defn}
+
+\pagebreak
+
+\begin{lemma}[Non-standard Central Limit Theorem] \label{thm:clt}
+Let $(X_n)_{n \in \hyp[\mathbb{N}]}$ be an internal $*$-independent identically distributed sequence of random variables.
+Suppose the mean of each random variable is $0$ and the variance of each is $1$.
+Then for any infinite hypernatural $M$ and any $\alpha \in \hyp$, have $$\mathbb{P}\left(\left\{ \omega \in \Omega: \frac{1}{\sqrt{M}} \sum_{n=1}^{M} X_n(\omega) \leq \alpha \right\}\right) \near \hyp[\gaussian](\alpha)$$
+where we recall that $\gaussian$ is the cumulative density of the normal distribution, as in condition 3 of Definition \ref{defn:brownian}.
+\end{lemma}
+
+\
+
+We join Hurd and Loeb in omitting the proof of this lemma; it is a fairly short but rather unenlightening consequence of the transfer principle applied to the standard Central Limit Theorem.
+The proof may be found as Theorem 21 from Anderson \cite{anderson}.
+
+\
+
+\begin{thm} \label{thm:brownian3}
+Property \ref{item:normal} of Definition \ref{defn:brownian} holds for the hyperfinite random walk.
+That is, if $\chi$ is defined as in Equation \ref{eqn:brownian}, and $X_t = \st(\chi(t, \cdot))$, then $$\mathbb{P}(\{ \omega \in \Omega^{(N)} : X_t(\omega) - X_s(\omega) \leq \alpha \}) = \gaussian \left(\frac{\alpha}{\sqrt{t-s}} \right)$$
+\end{thm}
+\begin{proof}
+The left-hand side is $$\mathbb{P}\left(\left\{ \omega \in \Omega^{(n)}: \st \left( \frac{1}{\sqrt{N}} \sum_{i=\lfloor N s \rfloor+1}^{\lfloor N t \rfloor} \omega_i \right) \leq \alpha \right\} \right)$$
+
+In order to apply the non-standard Central Limit Theorem, we need to manipulate this into a form which has a sum of random variables, rather than the \emph{standard part} of a sum of random variables.
+
+We can convert standard parts of sums into simple sums by passing to a limiting process: the left-hand side is precisely
+$$\lim_{r \to \infty} \mathbb{P}\left(\left\{ \omega \in \Omega^{(n)}: \frac{1}{\sqrt{N}} \sum_{i=\lfloor N s \rfloor+1}^{\lfloor N t \rfloor} \omega_i \leq \alpha+\frac{1}{r} \right\} \right)$$
+
+Now, to get this into precisely the form of the non-standard Central Limit Theorem, we must rewrite the sum so that its indices are from $1$ to some constant.
+Letting $$T = \lfloor N t \rfloor - \lfloor N s \rfloor$$ have
+$$\lim_{r \to \infty} \mathbb{P} \left( \left \{ \omega \in \Omega^{(n)} : \frac{1}{\sqrt{T}} \sum_{i=1}^{T} \omega_{i+\lfloor Ns \rfloor} \leq \left(\alpha + \frac{1}{r} \right) \frac{\sqrt{N}}{\sqrt{T}} \right \} \right)$$
+
+Let us assume for the moment that the collection of $Y_i(\omega) := \omega_{i+\lfloor Ns \rfloor}$ is $*$-independent.
+Certainly they all have mean $0$, variance $1$, and are identically distributed.
+
+By the non-standard Central Limit Theorem, each term of the limit is infinitesimally close to $$\hyp[\gaussian]\left( \left( \alpha+\frac{1}{r} \right) \frac{\sqrt{N}}{\sqrt{T}}\right) $$
+
+But $\gaussian$ is uniformly continuous because it is increasing, bounded and continuous.
+(Recall the non-standard definition of uniform continuity from Section \ref{sec:uniform}: infinitesimally perturbing $x$ induces only an infinitesimal perturbation in $\hyp[\gaussian](x)$.)
+Therefore $$\st \hyp[\gaussian]\left( \left( \alpha+\frac{1}{r} \right) \frac{\sqrt{N}}{\sqrt{T}}\right) = \gaussian \left(\st \left( \left( \alpha+\frac{1}{r} \right) \frac{\sqrt{N}}{\sqrt{T}} \right) \right)$$
+
+Recall that $$T = \lfloor N t \rfloor - \lfloor N s \rfloor$$
+so $$\frac{\sqrt{N}}{\sqrt{T}} = \frac{\sqrt{N}}{\sqrt{\lfloor N t \rfloor - \lfloor N s \rfloor}} \near \frac{1}{\sqrt{t-s}}$$
+because $$\lim_{n \to \infty} \frac{n}{\lfloor n t \rfloor - \lfloor n s \rfloor} = \frac{1}{t-s}$$
+
+Therefore each term of our limit is infinitesimally close to $$\gaussian \left( \left( \alpha+\frac{1}{r} \right)  \st \left(\frac{\sqrt{N}}{\sqrt{T}} \right) \right) = \gaussian \left(\left( \alpha+\frac{1}{r} \right) \frac{1}{\sqrt{t-s}}\right)$$
+
+Taking the limit as $r \to \infty$, obtain $$\gaussian \left(\frac{\alpha}{\sqrt{t-s}} \right)$$
+exactly as required.
+
+We still need to show that the collection of $Y_i(\omega) := \omega_{i+\lfloor Ns \rfloor}$ is $*$-independent, so as to justify the use of the non-standard Central Limit Theorem and complete the proof.
+But this is immediate: each $Y_i$ inspects a different part of the input.
+
+% ---- From this point is erroneous working I did when I had a typo $X_i$ instead of $\omega_i$ above, so I was proving the wrong things to be independent.
+% Notice that the proof of Theorem \ref{thm:brownian2} goes through to show that the collection of $X_t$ has the property that every (standard-finite) subcollection $(X_i)_{i=1}^m$ has the independence property: for any $(i_1, \dots, i_m) \in [0,1]^m$, have $X_{i_2} - X_{i_1}, \dots, X_{i_m} - X_{i_{m-1}}$ independent.
+%More elaborately stated,
+%
+%\begin{multline}(\forall m \in \mathbb{N}) \\
+%(\forall (i_1, \dots, i_m) \in [0,1]^m) (\forall (\alpha_1, \dots, \alpha_m) \in [0,1]^m) (\forall n \in \mathbb{N}^{\leq m}) \\
+%(\prod \mathbb{P}(X_{i_n}-X_{i_{n-1}} \leq \alpha_n) = \mathbb{P}(\bigcap \{ X_{i_n} - X_{i_{n-1}} \leq \alpha_n\}))
+%\end{multline}
+%
+%This fact transfers to
+%\begin{multline}(\forall m \in \hyp[\mathbb{N}]) \\
+%(\forall \text{$(i_1, \dots, i_m)$ internal} \in \hyp[[]0,1]^m) (\forall \text{$(\alpha_1, \dots, \alpha_m)$ internal} \in \hyp[[]0,1]^m) (\forall n \in \hyp[\mathbb{N}]^{\leq m}) \\
+%(\prod \mathbb{P}(X_{i_n}-X_{i_{n-1}} \leq \alpha_n) = \mathbb{P}(\bigcap \{ X_{i_n} - X_{i_{n-1}} \leq \alpha_n\}))
+%\end{multline}
+%
+%This is simply the required $*$-independence.
+\end{proof}
+
+Together, Theorems \ref{thm:brownian1}, \ref{thm:brownian2} and \ref{thm:brownian3} prove that the non-standard ``random walk'' approach yields a Brownian motion as defined in Definition \ref{defn:brownian}.
+
+\begin{remark}
+In fact, it is possible to prove that almost all of these Brownian motions are continuous: for almost all fixed $\omega$, it is the case that $t \mapsto X_t(\omega)$ is continuous.
+This is Theorem 6.13 of Hurd and Loeb \cite{hurdloeb}.
+
+That is, this scheme of creating Brownian motions almost always creates ``physically realistic'' motions, in the sense that the paths are continuous.
+\end{remark}
+
+\begin{thebibliography}{9}
+
+\bibitem{robinson}
+ Abraham Robinson,
+ \emph{Non-standard analysis},
+ Princeton Landmarks in Mathematics
+ 
+\bibitem{petry}
+  Andr\'{e} P\'{e}try,
+  \emph{Analyse Infinit\'{e}simale: une pr\'{e}sentation non standard}, first edition,
+  C\'{e}fal
+
+\bibitem{davis}
+  Isaac Davis,
+  \emph{An Introduction to Nonstandard Analysis}, \\
+  \url{www.math.uchicago.edu/~may/VIGRE/VIGRE2009/REUPapers/Davis.pdf}
+
+\bibitem{goldblatt}
+  Robert Goldblatt,
+  \emph{Lectures on the Hyperreals: an Introduction to Nonstandard Analysis},
+  Springer, Graduate Texts in Mathematics
+
+\bibitem{spivak}
+  Michael Spivak,
+  \emph{Calculus}, third edition,
+  Cambridge University Press
+  
+\bibitem{hurdloeb}
+  A. E. Hurd and P. A. Loeb,
+  \emph{An Introduction to Nonstandard Real Analysis},
+  Academic Press Inc
+  
+\bibitem{halmos}
+  Paul R Halmos,
+  \emph{Measure Theory},
+  Springer, Graduate Texts in Mathematics
+  
+\bibitem{williamson}
+  J. H. Williamson,
+  \emph{Lebesgue Integration},
+  Courier Corporation
+  
+\bibitem{anderson}
+  Robert M. Anderson,
+  \emph{A non-standard representation for Brownian motion and \^Ito integration},
+  Israel Journal of Mathematics, Vol. 25, 1976
+
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,154 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\usepackage{lmodern}
+
+% Reproducible builds
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
+
+\newmdtheoremenv{thm}{Theorem}[section]
+
+\newcommand{\prov}{\square}
+\newcommand{\encode}[1]{\ulcorner #1 \urcorner}
+\newcommand{\lob}{L\"ob's Theorem}
+
+\title{Parametric bounded version of L\"ob's theorem}
+\author{Patrick Stevens}
+\date{24th July 2016}
+
+\begin{document}
+
+\maketitle 
+\tiny \begin{center} \url{https://www.patrickstevens.co.uk/misc/ParametricBoundedLoeb2016/ParametricBoundedLoeb2016.pdf} \end{center}
+\normalsize
+
+\section{Introduction}
+I was recently made aware of a preprint\cite{critch} of a paper which proves a bounded version of \lob.
+
+\
+
+\begin{thm}[Parametric Bounded L\"ob]
+If $\prov A$ is the operator ``there exists a proof of $A$ in Peano arithmetic''
+and $\prov_k A$ is the operator ``there exists a proof of $A$ in $k$ or fewer lines in Peano arithmetic'',
+then for every formula $p$ of one free variable in the language of PA, and every computable $f: \mathbb{N} \to \mathbb{N}$
+which grows sufficiently fast, it is true that 
+$$(\exists \hat{k})[\color{red}(\vdash [\forall k][\color{green}\prov_{f(k)} p(k) \to p(k) \color{red}])\color{black} \Rightarrow \color{blue}(\vdash [\forall k > \hat{k}][p(k)]) \color{black}]$$
+\end{thm}
+
+\
+
+(Colour is used only to emphasise logical chunks of the formula.)
+
+The paper gives plenty of motivation about why this result should be interesting and useful:
+section 6 of the paper, for instance, is an application to the one-shot Prisoner's Dilemma
+played between agents who have access to each other's source code.
+However, I believe that while the theorem may be true and the proof may be correct,
+its application may not be as straightforward as the paper suggests.
+
+\section{Background}
+
+\begin{thm}[\lob]
+Suppose $\prov \encode{A}$ denotes ``the formula $A$ with G\"odel number $\encode{A}$ is provable''.
+If $$\mathrm{PA} \vdash (\prov \encode{P} \to P)$$
+then
+$$\mathrm{PA} \vdash P$$
+\end{thm}
+
+\
+
+\lob{} is at heart a statement about the incompatibility of the interpretation of the box as ``provable''
+with the intuitively plausible deduction rule that $\prov \encode{P} \to P$.
+(``If we have a proof of $P$, then we can deduce $P$!'')
+The Critch paper has an example in Section 1.4 where $P$ is the Riemann hypothesis.
+
+\section{Problem with the paper}
+
+Suppose $\mathcal{M}$ is a model of Peano arithmetic, in which our agent is working.
+It is a fact of first-order logic (through the L\"owenheim-Skolem theorem) that there is no first-order way of distinguishing any particular model of PA.
+Therefore the model of PA could be non-standard; this is not something a first-order reasoning agent could determine.
+
+If the agent is working with a non-standard model of PA, then all the theorems of the Critch paper may well go through.
+However, they become substantially less useful, as follows.
+
+Let us write $M$ for the underlying class (or set) of the model $\mathcal{M}$ of PA. Then the statement $$(\exists \hat{k})[\color{red}(\vdash [\forall k][\color{green}\prov_{f(k)} p(k) \to p(k) \color{red}])\color{black} \Rightarrow \color{blue}(\vdash [\forall k > \hat{k}][p(k)]) \color{black}]$$
+when relativised to the model $\mathcal{M}$ becomes
+$$(\exists \hat{k} \in M)[\color{red}(\vdash [\forall k \in M][\color{green}\prov^{\mathcal{M}}_{f(k)} p(k) \to p(k) \color{red}])\color{black} \Rightarrow \color{blue}(\vdash [\forall k \in M^{>\hat{k}}][p(k)]) \color{black}]$$
+where $\prov^{\mathcal{M}}_{f(k)}$ is now shorthand for ``there is a proof-object $P$ in $M$ such that $P$ encodes a $M$-proof of $p(k)$ which is fewer than $f(k)$ lines long''.
+
+Notice that the quantifiers have been restricted to $M$; in particular, $\hat{k}$ might be a non-standard natural number.
+Likewise, the ``there is a proof'' predicate is now ``there is an object which $M$ unpacks into a proof''; but such objects may be non-standard naturals themselves, and unpack into non-standard proofs (which $\mathcal{M}$ still believes are proofs, because it doesn't know the difference between ``standard'' and ``non-standard'').
+
+\subsection{Aside: non-standard proof objects}
+
+What is a non-standard proof object?
+Let's imagine we have some specific statements $a_i$ for each natural $i$ such that $a_i \to a_{i+1}$ for each $i$, and such that $a_0$ is an axiom of PA.
+I'm using $a_i$ only for shorthand; the reader should imagine I had some specific statements and specific proofs of $a_i \to a_{i+1}$.
+
+Consider the following proof of $a_2$:
+\begin{enumerate}
+\item $a_0$ (axiom)
+\item $a_1$ (by writing out the proof of $a_0 \to a_1$ above this line)
+\item $a_2$ (by writing out the proof of $a_1 \to a_2$ above this line)
+\end{enumerate}
+
+If we take a simple G\"odel numbering scheme, namely ``take the number to be an ASCII string in base $256$'',
+it's easy to see that this proof has a G\"odel number.
+After all, we're imagining that I have specific proofs of $a_i \to a_{i+1}$, so I could just write them in.
+Then you're reading this document which was originally encoded as ASCII, so the G\"odel numbering scheme must have worked.
+
+Similarly, there is a G\"odel number corresponding to the following:
+\begin{enumerate}
+\item $a_0$ (axiom)
+\item $a_1$ (by writing out the proof of $a_0 \to a_1$ above this line)
+\item \dots
+\item $a_k$ (by writing out the proof of $a_{k-1} \to a_k$ above this line)
+\end{enumerate}
+
+Now, suppose we're working in a non-standard model, and fix non-standard $K$.
+Then there is a (probably non-standard) natural $L$ corresponding to the following proof:
+\begin{enumerate}
+\item $a_0$ (axiom)
+\item $a_1$ (by writing out the proof of $a_0 \to a_1$ above this line)
+\item \dots
+\item $a_K$ (by writing out the proof of $a_{K-1} \to a_K$ above this line)
+\end{enumerate}
+
+Now, this is not a ``proof'' in our intuitive sense of the word, because from our perspective it's infinitely long.
+However, the model still thinks this is a proof, and that it's coded by the (non-standard) natural $L$.
+
+\subsection{Implication for PBL}
+
+So the model $\mathcal{M}$ believes there is a natural $\hat{k}$ such that \dots
+But if that natural is non-standard (and remember that this is not something the model can determine without breaking into second-order logic!)
+then PBL doesn't really help us.
+It simply tells us that all sufficiently-large non-standard naturals have a certain property; but that doesn't necessarily mean any standard naturals have that property.
+And the application to the Prisoners' Dilemma in Critch's paper requires a standard finite $\hat{k}$.
+
+If we, constructing the agent Fairbot, could somehow guarantee that it would be working within the standard model of PA, then all would be well.
+However, we can't do that within first-order logic.
+It could be the case that when constructing Fairbot, the only sufficiently-large naturals turn out to be non-standard.
+When we eventually come to run $\mathrm{Fairbot}_k(\mathrm{Fairbot}_k)$, it could therefore be that it will take nonstandardly-many proof steps to discover the ``(coooperate, cooperate)'' outcome.
+In practice, therefore, the agents would not find that outcome: we can only run them for standardly-many steps, and all non-standard naturals look infinite to us.
+
+
+\section{Acknowledgements}
+My thanks are due to Mi\"etek Bak (who persuaded me that there might be a problem with the article)
+and to John Aspden (who very capably forced Mi\"etek to clarify his objection until I finally understood it).
+As ever, any mistakes in this article are due only to me.
+
+\begin{thebibliography}{9}
+  
+\bibitem{critch}
+  Andrew Critch,
+  \emph{Parametric Bounded L\"ob's Theorem and Robust Cooperation of Bounded Agents},
+  \url{http://arxiv.org/abs/1602.04184v4}
+
+\end{thebibliography}
+
+\end{document}

@@ -1,1 +1,12 @@
+static/misc/FriedbergMuchnik/FriedbergMuchnik.tex
+static/misc/ModularMachines/EmbedMMIntoTuringMachine.tex
+static/misc/MonadicityTheorems/MonadicityTheorems.tex
+static/misc/AdjointFunctorTheorems/AdjointFunctorTheorems.tex
+static/misc/Tennenbaum/Tennenbaum.tex
+static/misc/MultiplicativeDetProof/MultiplicativeDetProof.tex
+static/misc/ParametricBoundedLoeb2016/ParametricBoundedLoeb2016.tex
+static/misc/TokyoEntrance2016/TokyoEntrance2016.tex
+static/misc/NonstandardAnalysis/NonstandardAnalysisPartIII.tex
 static/misc/RepresentableFunctors/RepresentableFunctors.tex
+static/misc/YonedaWithoutTears/YonedaWithoutTears.tex
+

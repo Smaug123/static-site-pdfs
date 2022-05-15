@@ -7,5 +7,5 @@ It is intended to be read in as a subtree to its [build pipeline](https://github
 
 ## The licence
 
-The `RepresentableFunctors.tex` file is CC BY-SA 4.0.
 The `pdf-targets.txt` file is licensed [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+All `.tex` files are CC BY-SA 4.0.

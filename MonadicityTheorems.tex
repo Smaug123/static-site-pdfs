@@ -1,0 +1,624 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\usepackage{tikz-cd}
+\usepackage{lmodern}
+
+% Reproducible builds
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\newmdtheoremenv{defn}{Definition}
+\newmdtheoremenv{thm}{Theorem}
+\newmdtheoremenv{motiv}{Motivation}
+
+\title{Motivation for the Monadicity Theorems}
+\author{Patrick Stevens}
+\date{12th December 2015}
+
+\begin{document}
+
+\maketitle
+
+\tiny \begin{center} \url{https://www.patrickstevens.co.uk/misc/MonadicityTheorems/MonadicityTheorems.pdf} \end{center}
+
+\normalsize
+
+\emph{You should draw diagrams yourself throughout this document. It will be unreadable as mere symbols.}
+
+\section{Definitions}
+
+\begin{defn}
+Given a monad $\mathbb{T}$ on $\mathcal{C}$, the Eilenberg-Moore category is $\mathcal{C}^{\mathbb{T}}$, the category of all algebras $(A, \alpha)$ with $A \in \mathcal{C}$ and $\alpha: TA \to A$, whose arrows are ``homomorphisms'' $f \in \text{mor}(\mathcal{C})$ such that $(A, \alpha) \to (B, \beta)$ has $f \alpha: TA \to B$ equalling $(Tf) \beta : TA \to B$.
+\end{defn}
+
+\
+
+\begin{defn} Given $\mathbb{T}$ a monad induced by $(F: \mathcal{C} \to \mathcal{D}) \dashv (G: \mathcal{D} \to \mathcal{C})$, where the unit and counit of the adjunction are $\eta, \epsilon$ respectively, the comparison functor $K: \mathcal{D} \to \mathcal{C}^{\mathbb{T}}$ is given by $K(B) = (GB, G \epsilon_B)$ and $K(f: A \to B) = Gf$.
+\end{defn}
+
+\
+
+\begin{defn}An adjunction $(F: \mathcal{C} \to \mathcal{D}) \dashv (G: \mathcal{D} \to \mathcal{C})$ is monadic if the comparison functor $K: \mathcal{D} \to \mathcal{C}^{\mathbb{T}}$ is part of an equivalence, where $\mathbb{T}$ is the monad induced by the adjunction.
+\end{defn}
+
+\
+
+That is, a monadic adjunction is one of the form ``$\mathcal{C}$ is being taken to a category of algebras'', like the free-group/forgetful functor adjunction.
+
+\
+
+\begin{defn}
+A functor $G: \mathcal{D} \to \mathcal{C}$ is monadic if it has a left adjoint and the adjunction is monadic.
+\end{defn}
+
+\
+
+\section{Algebras are coequalisers} \label{coeq}
+
+This is a lemma we're going to need a lot, so without motivating why, I'll just present it.
+I'll use the perhaps nonstandard terminology that $\alpha$ \emph{coequalises} two maps if the composites are equal, and it is a \emph{coequaliser} if it is universal among all coequalising maps.
+
+\
+
+\begin{thm}
+Let $(A, \alpha)$ be an algebra for monad $T: \mathcal{C} \to \mathcal{C}$.
+Then $\alpha: TA \to A$ is a coequaliser.
+\end{thm}
+
+\
+
+The way to think about this is from the free-group/forgetful-functor monad on $\mathbf{Sets}$.
+In this context, it means: ``every group is a quotient of a free group''.
+
+In the free-group context, $(A, \alpha)$ is a set $A$ together with a map $\alpha: TA \to A$ which ``tells us how to multiply''.
+That is, $\alpha$ precisely specifies the multiplication table for the group.
+
+Consider $TTA$, which is the set of words of words of elements of $A$.
+On the one hand, to get from a word $((a_1, a_2, \dots), (b_1, b_2, \dots), \dots)$ to an element of $A$, we could multiply out each word and then multiply again;
+on the other, we could flatten the word-of-words and then multiply.
+
+(Remember, $\alpha: TA \to A$ is the multiplication, and $\mu_A: TTA \to TA$ is the flattening operation.
+Note that $\alpha: (TA, \mu_A) \to (A, \alpha)$ is an algebra homomorphism, because $\alpha \mu_A = \alpha (T \alpha)$ is just part of the definition of an algebra homomorphism.)
+
+\[
+\begin{tikzcd}
+(TTA, \mu_{TA}) \arrow[r, shift left, "T\alpha"] \arrow[r, shift right, "\mu_A"']
+& (TA, \mu_A) \arrow[r, "\alpha"]
+& (A, \alpha)
+\end{tikzcd}
+\]
+
+I claim that doing these two gives the same result: that is, $\alpha$ coequalises the maps $T \alpha$ and $\mu_A : (TTA, \mu_{TA}) \to (TA, \mu_A)$.
+Indeed, the fact that $\alpha (T \alpha) = \alpha \mu_A : TTA \to A$ is just part of the definition of an algebra homomorphism.
+From the groups point of view, it's true that we can re-group terms and then multiply, and still get the same answer as just multiplying.
+
+I now claim that it's actually a coequaliser: any homomorphism $f: (TA, \mu_A) \to (B, \beta)$ which has $f (T \alpha) = f \mu_A$ must factor through $\alpha: TA \to A$.
+From the groups point of view, if we do some operation on the words which doesn't care about the grouping of the terms, it must be defined by its action on the generators (elements of the set $A$).
+
+\[
+\begin{tikzcd}
+(TTA, \mu_{TA}) \arrow[r, shift left, "T\alpha"] \arrow[r, shift right, "\mu_A"']
+& (TA, \mu_A)
+    \arrow[r, "\alpha"]
+    \arrow[dr, "f"]
+& (A, \alpha)
+    \arrow[d, dashrightarrow, "g"]
+\\
+&
+&
+(B, \beta)
+\end{tikzcd}
+\]
+
+Indeed, if we apply the forgetful functor, we obtain a split coequaliser (and hence a fortiori a coequaliser), because:
+
+\begin{itemize}
+\item it coequalises
+\item  $\eta_A : A \to TA$ inverts $\alpha: TA \to A$ (``inclusion into the free group'' vs ``multiplying out one-element words'')
+\item $\eta_{TA}: TA \to TTA$ inverts $T \alpha: TTA \to TA$
+\end{itemize}
+
+So there can only be one possible factorisation of $f$ through $\alpha$ (because forgetting the algebra structure would keep the factorisation the same, and we've just shown that forgetting the algebra structure we already have a coequaliser).
+
+There actually is a factorisation of $f$ through $\alpha$: say $g$ is the factorisation $A \to B$ once we've forgotten the algebra structure.
+Then we just need to show that $g$ is an algebra homomorphism $(A, \alpha) \to (B, \beta)$.
+(That is, we need to show that after we've forgotten the algebra structure, we can add in the algebra structure again without breaking $g$.)
+
+But it is: $g \alpha = \beta (Tg)$ because:
+
+\begin{itemize}
+\item We already know $g \alpha = f: TA \to B$ (by ``$g$ is a factorisation of $f$ through $\alpha$'')
+\item $f \mu_A = \beta (T f): $ because $f: TA \to B$ is an algebra hom
+\end{itemize}
+
+From the second and first together, we have $g \alpha \mu_A = \beta (T g) (T \alpha)$;
+since $\alpha$ is an algebra hom, we have $\alpha \mu_A = \alpha (T \alpha)$.
+
+Therefore $g \alpha T(\alpha) = \beta (Tg)(T \alpha)$, so $f T(\alpha) = \beta (Tg)(T\alpha)$.
+
+So it's enough for $T(\alpha)$ to be epic.
+Fortunately, we have already got that it's even split epic, so it is indeed epic, so we do have $g \alpha = \beta (Tg)$, so $g$ is an algebra hom.
+
+\subsection{Summary}
+
+That is, every algebra $(A, \alpha)$ is a coequaliser of two free algebras, $(TTA, \mu_{TA}) \to (TA, \mu_A)$ by $T \alpha$ and $\mu_A$.
+
+\section{Overview}
+
+Obviously we can't get rid of the need for $G$ to have an adjoint, because ``monadic'' is solely a property of an adjunction.
+So we want to find an equivalent way to characterise the fact that the adjunction is monadic.
+
+The ``equivalence of categories'' condition tells us that we somehow need to characterise when $K$ has a left adjoint $L$.
+(Recall that every equivalence can be refined to an adjoint equivalence.)
+
+Once we've done that, we'll need natural isomorphisms $\alpha: 1_{\mathcal{C}^{\mathbb{T}}} \to KL$ and $\beta: LK \to 1_{\mathcal{D}}$.
+The way we'll do that is to show that $A$ and $LKA$ are both coequalisers of the same thing, and $(A, \alpha)$ and $KL(A, \alpha)$ are also both coequalisers of the same thing.
+Since two objects which satisfy the UMP of the coequaliser must be isomorphic by a \emph{unique} isomorphism, this will prove the existence (``isomorphic'') and naturality (``unique'') of the bijection.
+(Recall that a natural transformation is iso if and only if it is pointwise iso.)
+
+\section{Adjoint for \texorpdfstring{$K$}{K}}
+
+We're looking for $L: \mathcal{C}^{\mathbb{T}} \to \mathcal{D}$, such that $LKB = L(GB, G \epsilon_B)$ is isomorphic to $B$ for each $B \in \mathcal{D}$.
+
+\subsection{Definition of \texorpdfstring{$L$}{L}}
+
+Can we show, then, that $L(GB, G \epsilon_B) \cong B$?
+
+This is a bit of a rabbit out of a hat, but remember that we've shown every $B$ is a coequaliser (as is $(B, \beta)$ for any hom $\beta$).
+Therefore, we could try and show that the following construction generalises.
+(Note from the far future: this diagram is wrong. $B \in \mathcal{D}$, but $GFB \in \mathcal{C}$.)
+
+\[
+\begin{tikzcd}
+GFGFB \arrow[r, shift left, "GF(G \epsilon_B)"] \arrow[r, shift right, "\mu_B"']
+& GFB \arrow[r, "G \epsilon_B"]
+& B \cong^{?} L(GB, G \epsilon_B)
+\end{tikzcd}
+\]
+
+(For the moment, there's not really any reason to suspect that this is an adjoint to $K$. I'm sorry. It is, though.)
+
+Well, there's a way to generalise it so that the objects look right, anyway: just throw away the initial $G$ from anywhere we can.
+Now the arrows are going to be nonsense, of course, and now the congruence doesn't make any sense.
+(Replace $\epsilon_B$ by $\beta$, because now it's a general arrow.)
+
+\[
+\begin{tikzcd}
+FGFB \arrow[r, shift left, "F \beta"] \arrow[r, shift right, "?"']
+& FB \arrow[r, "?"]
+& L(B, \beta)
+\end{tikzcd}
+\]
+
+What has to happen to the arrows?
+We had $G \epsilon_B = \beta$ before, but remember that in the monad $(\mathbb{T}, \eta, \mu)$ induced by the adjunction $F \dashv G$, we defined $\mu_B = G \epsilon_{FB}$.
+So actually we can get rid of the $G$ here!
+
+\[
+\begin{tikzcd}
+FGFB \arrow[r, shift left, "F \beta"] \arrow[r, shift right, "\epsilon_{F B}"']
+& FB \arrow[r, "?"]
+& L(B, \beta)
+\end{tikzcd}
+\]
+
+This is a general definition of $L(B, \beta)$: as the coequaliser of $F\beta$ and $\epsilon_{FB}$ from $FGFB \to FB$.
+
+Is it well-defined? That is, does the coequaliser exist?
+
+Notice that $F\beta$ and $\epsilon_{FB}$ both have inverse $F \eta_B$, so we have a reflexive pair; so it's enough for $\mathcal{D}$ to have coequalisers of reflexive pairs.
+
+Alternatively, if we apply $G$ to the diagram, we get:
+
+\[
+\begin{tikzcd}
+TTB \arrow[r, shift left, "T \beta"] \arrow[r, shift right, "G \epsilon_{F B}"']
+& TB
+\end{tikzcd}
+\]
+
+But we've already seen that this is part of a split coequaliser diagram (the three bullet-points in Section \ref{coeq}), so it does have a coequaliser in $\mathcal{C}$;
+therefore it's also, separately, enough for $G$ to create coequalisers of $G$-split pairs.
+
+\subsubsection{Summary} \label{summaryL}
+
+We have seen that if we have either of
+
+\begin{enumerate}
+\item $\mathcal{D}$ has coequalisers of reflexive pairs
+\item $G$ creates coequalisers of $G$-split pairs
+\end{enumerate}
+
+then our putative left-adjoint $L$ is well-defined as a function.
+
+It is defined on objects as a coequaliser:
+
+\[
+\begin{tikzcd}
+FGFB \arrow[r, shift left, "F \beta"] \arrow[r, shift right, "\epsilon_{F B}"']
+& FB \arrow[r, "l"]
+& L(B, \beta)
+\end{tikzcd}
+\]
+
+How do we define it on arrows?
+An entirely mechanical check tells us how:
+
+\[
+\begin{tikzcd}
+FGFB
+    \arrow[r, shift left, "F \beta"]
+    \arrow[r, shift right, "\epsilon_{F B}"']
+    \arrow[d, "FGFf"]
+& FB
+    \arrow[r, "l_B"]
+    \arrow[d, "Ff"]
+& L(B, \beta)
+    \arrow[d, dashrightarrow]
+\\
+FGFC
+    \arrow[r, shift left, "F \gamma"]
+    \arrow[r, shift right, "\epsilon_{F C}"']
+& FC
+    \arrow[r, "l_C"]
+& L(C, \gamma)
+\end{tikzcd}
+\]
+
+where the upper square and the lower square both commute (functoriality of $F$ and naturality of $\epsilon$, respectively).
+
+We can then chase arrows to show that $l_C \circ Ff$ coequalises $F\beta$ and $\epsilon_{FB}$, and so it must factor uniquely through $l_B$.
+
+\subsection{Functoriality of \texorpdfstring{$L$}{L}}
+
+We've shown that $L$ is defined, but is it a functor?
+It needs to:
+
+\begin{enumerate}
+\item preserve identities
+\item preserve composition
+\end{enumerate}
+
+Looking at the diagram at the end of the summary above (section \ref{summaryL}), it's clear that if $f = 1_B$ then the induced $L(f)$ must be $1_{(B, \beta)}$.
+
+For composition, if we just shove another copy of that diagram below itself, and join up all the arrows, it's another mechanical diagram-chase to show that the composition is preserved (using the uniqueness of the dashed arrows).
+
+\subsection{Adjointness of \texorpdfstring{$K$}{K} and \texorpdfstring{$L$}{L}}
+
+Finally, we get to the key bit!
+
+We'll use my favourite definition of an adjoint: as an initial object of $((A, \alpha) \downarrow L)$ for each $(A, \alpha) \in \mathcal{C}^{\mathbb{T}}$.
+
+The diagram we need to verify is:
+
+\[
+\begin{tikzcd}
+FGFA
+    \arrow[r, shift left, "F \alpha"]
+    \arrow[r, shift right, "\epsilon_{F A}"']
+& F A
+    \arrow[r]
+& L(A, \alpha)
+    \arrow[r, dashrightarrow, "g"]
+& B
+\\
+& & KL(A, \alpha)
+    \arrow[r, "K g"]
+& K B
+\\
+& & (A, \alpha)
+    \arrow[u, "i_{(A, \alpha)}"]
+    \arrow[ur, "f"']
+&
+\end{tikzcd}
+\]
+
+Since $KB = (GB, G \epsilon_B)$, the diagram becomes:
+
+\[
+\begin{tikzcd}
+FGFA
+    \arrow[r, shift left, "F \alpha"]
+    \arrow[r, shift right, "\epsilon_{F A}"']
+& F A
+    \arrow[r]
+& L(A, \alpha)
+    \arrow[r, dashrightarrow, "g"]
+& B
+\\
+& & KL(A, \alpha)
+    \arrow[r, "Kg"]
+& (GB, G \epsilon_B)
+\\
+& & (A, \alpha)
+    \arrow[u, "i_{(A, \alpha)}"]
+    \arrow[ur, "f"']
+&
+\end{tikzcd}
+\]
+
+\subsubsection{Uniqueness of $g$}
+
+Notice that the UMP of the coequaliser guarantees uniqueness of the arrow $g$, if it exists, because $FA \to B$ coequalises $F\alpha$ and $\epsilon_{FA}$ so it factors \emph{uniquely} through the coequaliser $L(A, \alpha)$.
+
+So we just need to define $i_{(A, \alpha)}$ and to show that $g$ exists for every $f$.
+
+\subsubsection{Existence of $g$}
+
+The only thing we can do with $f$ is to view it as a map $A \to GB$ and then apply $F$ to it, to raise it up to $\mathcal{D}$.
+And once we do that, it immediately becomes clear that we want to show that $\epsilon_B \circ Ff: FA \to B$ coequalises $F\alpha$ and $\epsilon_{FA}$.
+When we've got that, $\epsilon_B \circ Ff$ will factor through $L(A, \alpha)$ to give our map $g$.
+
+Since $f$ is an algebra hom, we have $f \alpha = G(\epsilon_B) \circ (Tf) = G(\epsilon_B \circ Ff)$.
+Applying $F$ obtain $F(f \alpha) = FG(\epsilon_B \circ Ff)$; if we hit this on the left with $\epsilon_B$ then we can use naturality on the right-hand side, so have $$\epsilon_B F(f \alpha) = \epsilon_B FG(\epsilon_B \circ Ff) = \epsilon_B \circ Ff \circ \epsilon_{FA}$$
+
+That is, for every arrow $f: (A, \alpha) \to K(B)$ there is exactly one arrow $g: L(A, \alpha) \to B$ such that $\epsilon_B \circ Ff = g \circ l: FA \to B$.
+
+\subsubsection{Definition of $i_A$}
+
+Conversely, any arrow $g: L(A, \alpha) \to B$ has a unique arrow $h = g \circ l: FA \to B$ satisfying $h(F \alpha) = h (\epsilon_{FA})$, and by the $F \dashv G$ adjunction, this corresponds to a unique arrow $\bar{h} = (Gh) \eta_A : A \to GB$.
+This tells us to define $i_{(A, \alpha)} : (A, \alpha) \to KL(A, \alpha)$ by $i_{(A, \alpha)} = (Gl) \eta_A$, where recall that $\eta$ is the unit of the $F \dashv G$ adjunction.
+
+$i_{(A, \alpha)}$ really is a homomorphism: have $KL(A, \alpha) = (GL(A, \alpha), G \epsilon_{L(A, \alpha)})$, so need $$G \epsilon_{L(A, \alpha)} \circ T(i_{(A, \alpha)}) = i_{(A, \alpha)} \alpha$$
+The right-hand side is $(Gl) \eta_A \alpha$, which by definition of an algebra hom is just $Gl$; the left-hand side is $$G(\epsilon_{L(A, \alpha)} \circ FGl \circ F\eta_A)$$
+which by naturality of $\eta$ is $$G(l \epsilon_{FA} \circ F \eta_A)$$
+which by a monad identity is just $Gl$.
+
+So we have the homomorphism $i_{(A, \alpha)}$.
+
+\subsubsection{Verify the triangle}
+
+We have one thing left to do: to show that $Kg \circ i_{(A, \alpha)} = f$ for all $f: (A, \alpha) \to K(B)$.
+
+We have $$Kg \circ i_{(A, \alpha)} = Gg \circ Gl \circ \eta_A = G(\epsilon_B \circ Ff) \circ \eta_A$$
+so by naturality of $\eta$, this is just $f$ straight away.
+
+\subsection{Unmotivated bits}
+
+Once you have the idea of ``generalise the fact that $GB$ is a coequaliser'', the rest is basically forced, although it's taken me several hours to work out the steps.
+(``Forced'' is not the same as ``easy''!)
+That is the only unmotivated step in the construction of this adjoint.
+
+\section{Monadicity Theorems}
+
+We've actually done most of the hard work now.
+We've shown that every algebra occurs as a certain coequaliser, and that under one of two conditions
+
+\begin{enumerate}
+\item $\mathcal{D}$ has coequalisers of reflexive pairs
+\item $G$ creates coequalisers of $G$-split pairs
+\end{enumerate}
+the comparison functor has a left adjoint which is defined as another coequaliser.
+I'll restate them here for convenience.
+
+\
+
+\begin{thm}[Algebra as coequaliser]
+\[
+\begin{tikzcd}
+(TTA, \mu_{TA}) \arrow[r, shift left, "T\alpha"] \arrow[r, shift right, "\mu_A"']
+& (TA, \mu_A) \arrow[r, "\alpha"]
+& (A, \alpha)
+\end{tikzcd}
+\]
+\end{thm}
+
+\
+
+\begin{defn}[Adjoint $L$ of $K$]
+\[
+\begin{tikzcd}
+FGFA
+    \arrow[r, shift left, "F \alpha"]
+    \arrow[r, shift right, "\epsilon_{F A}"']
+& F A
+    \arrow[r, "l"]
+& L(A, \alpha)
+\end{tikzcd}
+\]
+
+The unit of the adjunction is $i_{(A, \alpha)} = (Gl) \eta_A : (A, \alpha) \to KL(A, \alpha)$.
+\end{defn}
+
+\
+
+We also showed that if we forget the algebra structure from the coequaliser, then we get another coequaliser, this time in $\mathcal{C}$ rather than $\mathcal{C}^{\mathbb{T}}$; this was because the algebra-coequaliser diagram is in fact a split coequaliser, so is preserved by all functors.
+
+Remembering that $\mu_A = G \epsilon_{FA}$, we see that actually these two diagrams are extremely similar.
+$(A, \alpha)$ is a coequaliser of the diagram you get when you apply $G$ to the diagram for $L(A, \alpha)$.
+
+We want to find two natural isomorphisms $\gamma: 1_{\mathcal{C}^{\mathbb{T}}} \to KL$ and $\delta: 1_{\mathcal{D}} \to LK$; this will demonstrate the equivalence of the two categories.
+
+\subsection{Finding \texorpdfstring{$\delta: 1_{\mathcal{D}} \to LK$}{delta}} \label{findingdelta}
+
+Recall that for $B \in \mathcal{D}$, have $LK(B) = L(GB, G \epsilon_B)$.
+That is, $LK(B)$ is the coequaliser in the following diagram:
+
+\[
+\begin{tikzcd}
+FGFGB
+    \arrow[r, shift left, "FG \epsilon_B"]
+    \arrow[r, shift right, "\epsilon_{FGB}"']
+& FGB
+    \arrow[r, "l"]
+& L(GB, G \epsilon_B)
+\end{tikzcd}
+\]
+
+Now observe that $\epsilon_B: FGB \to B$ coequalises that diagram too - that's just what it means for $\epsilon$ to be natural - so it must factor through the coequaliser.
+
+\[
+\begin{tikzcd}
+FGFGB
+    \arrow[r, shift left, "FG \epsilon_B"]
+    \arrow[r, shift right, "\epsilon_{FGB}"']
+& FGB
+    \arrow[r, "l"]
+    \arrow[dr, "\epsilon_B"']
+& L(GB, G \epsilon_B) = LKB
+    \arrow[d, dashrightarrow, "\nu_B"]
+\\
+& & B
+\end{tikzcd}
+\]
+
+We want $\nu_B$ to be an isomorphism.
+
+We had two conditions for $L$ being well-defined.
+
+\subsubsection{$G$ creates coequalisers of $G$-split pairs}
+In this case, in fact $\epsilon_B$ is a coequaliser, not just coequalising, because when we apply $G$ to the diagram we get a coequaliser of a split pair.
+So immediately $\nu_B$ is an iso.
+
+\subsubsection{$\mathcal{D}$ has coequalisers of reflexive pairs}
+In this case, applying $G$ to the diagram, and assuming that $G$ preserves coequalisers of reflexive pairs, we will get a diagram as follows, where the top line is a coequaliser:
+
+\[
+\begin{tikzcd}
+GFGFGB
+    \arrow[r, shift left, "GFG \epsilon_B"]
+    \arrow[r, shift right, "G \epsilon_{FGB}"']
+& GFGB
+    \arrow[r, "Gl"]
+    \arrow[dr, "G\epsilon_B"']
+& GL(GB, G \epsilon_B) = GLKB
+    \arrow[d, dashrightarrow, "G \nu_B"]
+\\
+& & GB
+\end{tikzcd}
+\]
+
+But notice that the following is a split coequaliser diagram, and hence is a coequaliser:
+
+\[
+\begin{tikzcd}
+GFGFGB
+    \arrow[r, shift left=0.7ex, "GFG \epsilon_B"]
+    \arrow[r, shift right=1.4ex, "G \epsilon_{FGB}"]
+& GFGB
+    \arrow[l, shift left=2.1ex, "\eta_{GFGB}"]
+    \arrow[r, shift right, "G \epsilon_B"']
+& GB
+    \arrow[l, shift right, "\eta_{GB}"']
+\end{tikzcd}
+\]
+
+Indeed:
+
+\begin{itemize}
+\item The rightwards maps are coequalising (because if we remove a $G$ from the diagram, we get something which was coequalising)
+\item $(G \epsilon_B) \eta_{GB} = 1_{GB}$ (adjunction identity)
+\item $\eta_{GB} (G \epsilon_B) = (GFG \epsilon_B)(\eta_{GFGB})$ (naturality of $\eta$)
+\item $(G \epsilon_{FGB})(\eta_{GFGB}) = 1_{GFGB}$ (adjunction identity)
+\end{itemize}
+
+Therefore $G \nu_B$ is an isomorphism.
+If we make the further assumption that $G$ reflects isos, then $\nu_B$ must be an isomorphism.
+
+What else did we assume in this section?
+\begin{enumerate}
+\item $G$ preserves coequalisers of reflexive pairs
+\item $G$ reflects isomorphisms
+\end{enumerate}
+
+\subsubsection{Naturality of the isomorphism}
+
+I claim that actually $\nu$ is the counit of the adjunction.
+This would make it automatically natural.
+
+Recall from the start of this section (\ref{findingdelta}) that $\nu_B$ is just the factorisation of $\epsilon_B$ across the coequaliser $l: FGB \to L(GB, G \epsilon_B)$.
+
+Therefore it corresponds to $\epsilon_B$ in the natural bijection between ``maps $FGB \to B$ which coequalise $FG \epsilon_B$ and $\epsilon_{FGB}$'' and ``maps $L(GB, G \epsilon_B)$''.
+
+But $\epsilon_B$ corresponds naturally to the identity $1_{GB}$ via the adjunction $F \dashv G$.
+
+So using $U$ for the forgetful functor, $U(1_{KB}) = 1_{GB} \leftrightarrow \epsilon_B \leftrightarrow \nu_B$, all naturally, and so $\nu_B$ must be the lift of $1_{KB}$ over the adjunction $L \vdash K$.
+
+Therefore $\nu$ is actually the counit.
+
+\subsection{Finding \texorpdfstring{$\gamma: 1_{\mathcal{C}^{\mathbb{T}}} \to KL$}{gamma}}
+
+Recall that the unit of the $L \dashv K$ adjunction was $i_{(A, \alpha)} = (Gl) \eta_A : (A, \alpha) \to KL(A, \alpha)$.
+
+We'll show that this unit is a natural isomorphism.
+
+Recall that $\alpha: (TA, \mu_A) \to (A, \alpha)$ is a coequaliser; that is precisely $\alpha: KFA \to (A, \alpha)$.
+
+Applying $K$ to the diagram of Definition 5, we must still get something which coequalises, and so it factors through the coequaliser:
+
+\[
+\begin{tikzcd}
+KFGFA
+    \arrow[r, shift left, "KF \alpha"]
+    \arrow[r, shift right, "K \epsilon_{F \alpha}"']
+& KFA
+    \arrow[r, "\alpha"]
+    \arrow[dr, "K l"']
+& (A, \alpha)
+    \arrow[d, dashrightarrow]
+\\
+& & KL(A, \alpha)
+\end{tikzcd}
+\]
+
+I claim that $i_{(A, \alpha)}$ is this dashed arrow.
+Indeed, $i_{({A, \alpha})} \circ \alpha = (Gl) \eta_A \circ \alpha = Gl = Kl$, so by uniqueness of the lift, it must be $i_{(A, \alpha)}$.
+
+It is therefore immediately a natural transformation, being the unit of an adjunction.
+
+It is an iso: if we forget the algebra structure, we end up with the following diagram:
+
+\[
+\begin{tikzcd}
+GFGFA
+    \arrow[r, shift left, "GF \alpha"]
+    \arrow[r, shift right, "G \epsilon_{F \alpha}"']
+& GFA
+    \arrow[r, "\alpha"]
+    \arrow[dr, "G l"']
+& A
+    \arrow[d, dashrightarrow, "i_A"]
+\\
+& & GL(A, \alpha)
+\end{tikzcd}
+\]
+
+But $\alpha$ is still a coequaliser here (we proved earlier that it remained a coequaliser after forgetting the algebra structure), and $Gl$ is also a coequaliser because of our two assumptions: either $G$ preserves coequalisers of reflexive pairs (and hence the coequaliser structure of Definition 5's diagram), or else it creates coequalisers of $G$-split pairs and so we're immediately done.
+
+Therefore $i_A$ must be an isomorphism in $\mathcal{C}$, because $\alpha$ and $Gl$ are both coequalisers.
+
+It is also an isomorphism in $\mathcal{C}^{\mathbb{T}}$, because the forgetful functor reflects isomorphisms: suppose $f: (A, \alpha) \to (B, \beta)$ has an inverse $g: B \to A$ once the algebra structure is forgotten.
+Then $g$ is an algebra homomorphism, because we just need $g \beta = \alpha T(g)$; but that is equivalent to $\beta T(f) = f \alpha$ by pre-composing $f$ and post-composing $T(f)$.
+Because $f$ is already an algebra homomorphism, this condition is true.
+
+Therefore $i_A$ is an iso in $\mathcal{C}^{\mathbb{T}}$, and so we are finished.
+
+\section{Summary}
+
+We have shown that $K: \mathcal{D} \to \mathcal{C}^{\mathbb{T}}$ has a left adjoint $L$ under one of two conditions;
+that the adjunction's unit is an isomorphism under a further assumption;
+and that the adjunction's counit is an isomorphism under a further assumption.
+
+Together, this tells us that $K$ is part of an equivalence: that is, $G$ is monadic.
+
+\
+
+\begin{thm}[Monadicity Theorems, one direction]
+Suppose $G: \mathcal{D} \to \mathcal{C}$ is a functor which has a left adjoint. If 
+\begin{enumerate}
+\item $G$ creates coequalisers of $G$-split pairs, or
+\item $G$ reflects isomorphisms, $\mathcal{D}$ has coequalisers of reflexive pairs, and $G$ preserves them 
+\end{enumerate}
+then $G$ is monadic.
+\end{thm}
+
+\end{document}

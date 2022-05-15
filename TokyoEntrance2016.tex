@@ -1,0 +1,99 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{hyperref}
+\usepackage{lmodern}
+
+% Reproducible builds
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{Tokyo 2016 Graduate School Entrance Exam}
+\author{Patrick Stevens}
+\date{16th March, 2017}
+
+\begin{document}
+\maketitle
+
+\tiny \begin{center} \url{https://www.patrickstevens.co.uk/misc/TokyoEntrance2016/TokyoEntrance2016.pdf} \end{center}
+\normalsize
+
+\section{Question 2}
+\subsection{Prove \texorpdfstring{that $S = 2\pi \int_{-1}^1 F(y, y') \ \mathrm{d}x$}{a certain integral form for S}}
+The surface may be parametrised as $$S(x, \theta) = (x, y(x) \cos(\theta), y(x) \sin(\theta))$$
+where $\theta \in [0, 2\pi)$ and $x \in [-1,1]$.
+
+Hence $$\dfrac{\partial S}{\partial x} = (1, y'(x) \cos(\theta), y'(x) \sin(\theta))$$ and $$\dfrac{\partial S}{\partial \theta} = (0, -y(x) \sin(\theta), y(x) \cos(\theta))$$
+so the surface element $$\mathrm{d}\Sigma = \left| \left(1, y'(x) \cos(\theta), y'(x) \sin(\theta) \right) \times (0, -y(x) \sin(\theta), y(x) \cos(\theta)) \right| \mathrm{d}x \mathrm{d}\theta$$
+i.e. $$y \sqrt{1+(y')^2}$$
+
+The integral is therefore $$\int_{0}^{2 \pi} \int_{-1}^1 y \sqrt{1+(y')^2} \mathrm{d}x \mathrm{d}\theta$$
+as required.
+
+\subsection{Prove the first integral of the Euler-Lagrange equation}
+We know the Euler-Lagrange equation $$\dfrac{\partial F}{\partial y} = \dfrac{\mathrm{d}}{\mathrm{d}x} \dfrac{\partial F}{\partial y'}$$
+
+Now, $$\frac{\mathrm{d}F}{\mathrm{d}{x}} = \dfrac{\partial F}{\partial y} \dfrac{\mathrm{d}y}{\mathrm{d}x} + \dfrac{\partial F}{\partial y'} \dfrac{\mathrm{d}y'}{\mathrm{d}x}$$
+so substituting Euler-Lagrange into this:
+$$\frac{\mathrm{d}F}{\mathrm{d}{x}} = \dfrac{\mathrm{d}}{\mathrm{d}x} \left(\dfrac{\partial F}{\partial y'}\right) \dfrac{\mathrm{d}y}{\mathrm{d}x} + \dfrac{\partial F}{\partial y'} \dfrac{\mathrm{d}y'}{\mathrm{d}x}$$
+
+Notice the right-hand side is just what we get by applying the product rule: it is $$\dfrac{\mathrm{d}}{\mathrm{d}x} \left( \dfrac{\partial F}{\partial y'} \dfrac{\mathrm{d}y}{\mathrm{d}x} \right)$$
+
+The result follows now by simply integrating both sides with respect to $x$.
+
+\subsection{Solve the differential equation}
+
+Just substitute $F(y,y') = y \sqrt{1+(y')^2}$:
+$$y\sqrt{1+(y')^2} - y' \left[ \frac{1}{2} y (1+(y')^2)^{-1/2} \cdot 2 y'\right] = c$$
+which can be simplified to $$y (1+(y')^2)^{-1/2} \left[ (1+(y')^2) -(y')^2\right] = c$$
+i.e. $$y^2 - c^2 = (c y')^2$$
+
+If $c=0$ then this is trivial: $y=0$. From now on, assume $c \not = 0$; then since $y$ is known to be positive, $c > 0$.
+
+Invert: $$\frac{c^2}{y^2-c^2} = \left(\frac{dx}{dy}\right)^2$$
+so $$\dfrac{dx}{dy} = \pm \frac{c}{\sqrt{y^2-c^2}}$$
+which is a standard integral: $$x = \pm c \log(y+\sqrt{y^2-c^2}) + K$$
+
+Also $y(-1) = 2 = y(1)$, so $$\{1,-1\} = \{c \log(2+\sqrt{4-c^2}) + K, -c \log(2+\sqrt{4-c^2}) + K\}$$
+which means $K = 0$.
+
+Then $$\exp\left(\pm \frac{x}{c}\right) = y+\sqrt{y^2-c^2}$$
+Since $y(1) = 2$, we have $$\exp(\pm 1/c) = 2+\sqrt{4-c^2}$$ and in particular (since $c>0$) we have the $\pm$ on the left-hand side being positive; that is the expression $c$ is required to satisfy.
+
+Rearrange: $$y = \frac{c+\exp(2 \frac{x}{c})}{2 \exp\left(\frac{x}{c}\right)}$$
+which completes the question.
+
+\section{Question 3}
+\subsection{Part 1}
+We must put one ball into each box. Then we are distributing $n-r$ balls freely among $r$ boxes, so the answer is $$\binom{n-r-1}{r-1}$$
+(standard stars-and-bars result).
+
+\subsection{Part 2}
+Consider the $n$ black balls laid out in a line; we are interspersing the $m$ white balls among them.
+Equivalently, we have $n+1$ boxes (represented by the gaps between black balls) and we are trying to put $m$ balls into them.
+By stars-and-bars again, the answer is $\binom{n}{m-1}$.
+
+\subsection{Part 3}
+Condition on the colour of the first ball, and write $l$ for the length of the first run.
+Then
+$$P_{n,m}(r,s) = \frac{n}{n+m} \sum_{l=0}^{n} P_{n-l,m}(r-1, s) + \frac{m}{n+m} \sum_{l=0}^m P_{n, m-l}(r, s-1)$$
+Also $P_{n,m}(0,s) = \chi[n=0] \chi[s=1]$ where $\chi$ is the indicator function, and $P_{n,m}(r,0) = \chi[m=0] \chi[r=1]$.
+
+\subsection{Part 4}
+
+\subsection{Part 5}
+If $m \leq n$, then the sum is $$\sum_{l=0}^m \binom{n}{l} \binom{m}{m-l}$$ which is the $x^m$ coefficient of the left-hand side and hence of the right-hand side.
+
+If $m > n$, then the sum is $$\sum_{l=0}^n \binom{n}{n-l} \binom{m}{l}$$ which is the $x^n$ coefficient of the left-hand side and hence of the right-hand side.
+
+For the second equation: this follows by setting $n \mapsto n-1$ in the above.
+
+\subsection{Part 6}
+
+\end{document}  

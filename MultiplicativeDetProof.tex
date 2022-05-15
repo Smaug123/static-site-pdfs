@@ -1,0 +1,85 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath,amsthm}
+\usepackage{epstopdf}
+\usepackage{hyperref}
+\usepackage{lmodern}
+
+% Reproducible builds
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{Proof that the determinant is multiplicative}
+\author{Patrick Stevens}
+\date{17th April 2014}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\begin{document}
+
+\maketitle
+
+\tiny \begin{center} \url{https://www.patrickstevens.co.uk/misc/MultiplicativeDetProof/MultiplicativeDetProof.pdf} \end{center}
+
+\normalsize
+
+\
+
+This is a very concrete proof of the multiplicity of the determinant.
+It contains no cleverness at all, and is simply manipulation of expressions.
+
+\
+
+\begin{definition}
+The \emph{determinant} of a matrix $A$ is given by $$\sum_{\sigma \in S_n} \epsilon(\sigma) \prod_{i=1}^n A_{i, \sigma(i)}$$
+where $S_n$ is the symmetric group on $n$ elements, and $\epsilon$ is the signature of that element.
+\end{definition}
+
+\begin{lemma}
+Let $\rho \in S_n$, and let $A$ be a matrix. Then
+$$\sum_{\sigma \in S_n} \epsilon(\sigma) \prod_{i=1}^n A_{\rho(i) \sigma(i)} = \epsilon(\rho) \det(A)$$ 
+\end{lemma}
+
+\begin{proof}
+\begin{align*}
+\epsilon(\rho) \det(A) &= \epsilon(\rho) \sum_{\sigma \in S_n} \epsilon(\sigma) \prod_{i=1}^n A_{i, \sigma(i)}
+\\&= \sum_{\sigma \in S_n} \epsilon(\sigma \rho) \prod_{i=1}^n A_{i, \sigma(i)}
+\\&= \sum_{\sigma \in S_n} \epsilon(\sigma \rho) \prod_{i=1}^n A_{\rho(i), \sigma(\rho(i))}
+\\&= \sum_{\tau \in S_n} \epsilon(\tau) \prod_{i=1}^n A_{\rho(i), \tau(i)}
+\\&= \sum_{\tau \in S_n} \epsilon(\sigma) \prod_{i=1}^n A_{\rho(i), \sigma(i)}
+\end{align*}
+
+\end{proof}
+
+\begin{theorem}$$\det(AB) = \det(A) \det(B)$$
+\end{theorem}
+\begin{proof}
+We use summation convention throughout.
+\begin{align*}
+\det(AB) &= \sum_{\sigma \in S_n} \epsilon(\sigma) \prod_{i=1}^n (AB)_{i, \sigma(i)}
+\\ &= \sum_{\sigma \in S_n} \epsilon(\sigma) A_{1, k_1} B_{k_1, \sigma(1)} A_{2, k_2} B_{k_2, \sigma(2)} \dots A_{n, k_n} B_{k_n, \sigma(n)}
+\\ &= \sum_{\sigma \in S_n} \epsilon(\sigma) A_{1, k_1} A_{2, k_2} \dots A_{n, k_n} B_{k_1, \sigma(1)} \dots B_{k_n, \sigma(n)}
+\end{align*}
+But the $k_1, \dots, k_n$ only ever contribute when they are a permutation of $1, \dots, n$, because (assuming wlog $k_1 = k_2$) for each $\sigma^+$ there exists $\sigma^-$ such that $\sigma^+(1) = \sigma^-(2), \sigma^-(1) = \sigma^+(2), \sigma^-(k) = \sigma^+(k)$ for other $k$. Then we have
+$$A_{1, k_1} B_{k_1, \sigma^+(1)} A_{2 k_1} B_{k_1 \sigma^+(2)} \text{terms} = A_{1, k_1} B_{k_1, \sigma^-(1)}  A_{2 k_1} B_{k_1 \sigma^-(2)} \text{terms}$$
+and because $\epsilon$ negates the sign, we have that these two terms cancel.
+
+Hence the sum over $k_i$ is in fact a sum over all $\rho$ such that $\rho(i) = k_i$ for all $i$:
+Then $$\det(AB) = \sum_{\rho \in S_n} \sum_{\sigma \in S_n} \epsilon(\sigma) A_{1, \rho(1)} A_{2, \rho(2)} \dots A_{n, \rho(n)} B_{\rho(1), \sigma(1)} \dots B_{\rho(n), \sigma(n)}$$
+Applying the lemma gives
+\begin{align*}
+\det(AB) &= \det(B) \sum_{\rho \in S_n} \epsilon(\rho) A_{1, \rho(1)} A_{2, \rho(2)} \dots A_{n, \rho(n)} 
+\\&= \det(B) \det(A)
+\end{align*}
+
+\end{proof}
+
+\end{document}  
