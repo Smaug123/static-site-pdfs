@@ -37,7 +37,23 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "scripts": "scripts"
+      }
+    },
+    "scripts": {
+      "locked": {
+        "lastModified": 1696031019,
+        "narHash": "sha256-MuKEC8ZZ1Znm2idxQEQYU18z/1l9rjBZaj5gdKd9elQ=",
+        "owner": "Smaug123",
+        "repo": "flake-shell-script",
+        "rev": "05cc0582a193d3b42b6b4e64c6ec7a9bca4bb3c5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Smaug123",
+        "repo": "flake-shell-script",
+        "type": "github"
       }
     },
     "systems": {
