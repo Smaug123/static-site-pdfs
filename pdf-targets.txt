@@ -9,4 +9,4 @@ static/misc/TokyoEntrance2016/TokyoEntrance2016.tex
 static/misc/NonstandardAnalysis/NonstandardAnalysisPartIII.tex
 static/misc/RepresentableFunctors/RepresentableFunctors.tex
 static/misc/YonedaWithoutTears/YonedaWithoutTears.tex
-
+static/misc/DogeConfPBT/DogeConfPBT.tex

@@ -36,13 +36,13 @@
 
         installPhase = ''
           mkdir -p $out
-          cp ./*.pdf $out
-          cp ./*.tex $out
+          cp ./**/*.pdf $out
+          cp ./**/*.tex $out
           cp ./pdf-targets.txt $out
         '';
       };
       devShells.default = pkgs.mkShell {
-        buildInputs = [pkgs.alejandra pkgs.shellcheck];
+        buildInputs = [pkgs.alejandra pkgs.shellcheck texlive];
       };
     });
 }
