@@ -55,7 +55,7 @@
     \begin{definition}
         Let $F, G: \mathcal{C} \to \mathcal{D}$ be functors.
         A \emph{natural transformation} from $F$ to $G$ is a selection $\alpha$, parametrised over each $X \in \mathcal{C}$, of an arrow $\alpha_X$ in $\mathcal{D}$ from $FX \to GX$.
-        We require this selection to be ``natural'' in that whenever $f : X \to Y$ is an arrow in $\mathcal{C}$, we have $$FX \xrightarrow{Ff} FY \xrightarrow{\alpha_Y} GY = FX \xrightarrow{\alpha_X} GX \xrightarrow{Gf} GY$$
+        We require this selection to be ``natural'' in that whenever $f : X \to Y$ is an arrow in $\mathcal{C}$, we have $$(FX \xrightarrow{Ff} FY \xrightarrow{\alpha_Y} GY) = (FX \xrightarrow{\alpha_X} GX \xrightarrow{Gf} GY)$$
     \end{definition}
 
     \
@@ -74,7 +74,7 @@
     \begin{thm}[The Yoneda lemma]
         Let $\mathcal{C}$ be a category, and let $G: \mathcal{C} \to \Set$ be a functor.
         Let $A$ be an object of $\mathcal{C}$.
-        Then $$\Nat [\homfrom{A} \to G ] \cong G A$$
+        Then $$\Nat [\homfrom{A}, G] \cong G A$$
         and moreover the bijection is natural in both $G$ and $A$.
     \end{thm}
 
@@ -121,7 +121,7 @@
     (Note that this is not quite what is usually meant by a model homomorphism, and I have invented the term ``fixed model homomorphism'' to describe it.)
     
     A \emph{fixed model homomorphism} $\alpha$ is a function from one model $F: \mathcal{C} \to \Set$ of the theory $\mathcal{C}$ to another model $G: \mathcal{C} \to \Set$, which assigns to each type $FA$ of the model $F$ the corresponding type $GA$ of the model $G$, in such a way that $\alpha$ respects the predicates $Ff: FA \to FB$ of the model:
-    $$FA \xrightarrow{Ff} FB \xrightarrow{\alpha_B} GB = FA \xrightarrow{\alpha_A} GA \xrightarrow{Gf} GB$$
+    $$(FA \xrightarrow{Ff} FB \xrightarrow{\alpha_B} GB) = (FA \xrightarrow{\alpha_A} GA \xrightarrow{Gf}) GB$$
 
 Notice that this is a model homomorphism which additionally ensures that $FA$ is always mapped to $GA$ (for any $A$), so (for example) it won't collapse all the objects $FA$ into a single object in $G$'s image unless $G$ is the trivial model.
 
@@ -130,7 +130,7 @@ Notice that this is a model homomorphism which additionally ensures that $FA$ is
     So the second key insight is that a natural transformation between functors $F: \mathcal{C} \to \Set$ and $G$ is just a fixed homomorphism between the $\Set$-models $F$ and $G$ of the theory $\mathcal{C}$.
 
     \section{Free models}
-    Throughout mathematics, there is the notion of a free object: an object which somehow has the least possible structure while still obeying all the rules it has to obey.
+    Throughout mathematics, there is the notion of a free object: an object which somehow has the least possible restriction while still obeying all the rules it has to obey.
     Can we find a free model of the theory represented by the category $\mathcal{C}$?
 
     Imagine $\mathcal{C}$ has two objects. Then any free model worth its name must have at least two types - otherwise we've definitely lost information in the model.
