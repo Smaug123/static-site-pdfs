@@ -2,8 +2,8 @@
   description = "PDFs hosted on patrickstevens.co.uk";
 
   inputs = {
-    flake-utils.url = github:numtide/flake-utils;
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
+    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     scripts.url = "github:Smaug123/flake-shell-script";
   };
 
@@ -21,7 +21,7 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in let
       texlive = pkgs.texlive.combine {
-        inherit (pkgs.texlive) scheme-medium mdframed etoolbox zref needspace tikz-cd;
+        inherit (pkgs.texlive) scheme-basic mdframed etoolbox zref needspace tikz-cd mathtools metafont pgf beamer listings caption fancyvrb eso-pic;
       };
     in {
       packages.default = pkgs.stdenv.mkDerivation {
