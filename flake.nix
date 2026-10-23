@@ -20,9 +20,9 @@
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in let
-      texlive = pkgs.texlive.combine {
-        inherit (pkgs.texlive) scheme-basic mdframed etoolbox zref needspace tikz-cd mathtools metafont pgf beamer listings caption fancyvrb eso-pic;
-      };
+      texlive = pkgs.texliveSmall.withPackages (
+        ps: with ps; [scheme-basic mdframed etoolbox zref needspace tikz-cd mathtools metafont pgf beamer listings caption fancyvrb eso-pic]
+      );
     in {
       packages.default = pkgs.stdenv.mkDerivation {
         __contentAddressed = true;
